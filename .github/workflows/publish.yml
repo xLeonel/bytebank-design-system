@@ -21,7 +21,7 @@ jobs:
           always-auth: true
 
       - name: Install dependencies
-        run: npm ci --no-optional
+        run: npm install --no-optional
 
       - name: Build
         run: npm run build
