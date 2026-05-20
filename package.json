@@ -1,0 +1,35 @@
+{
+  "name": "@xleonel/bytebank-design-system",
+  "version": "1.0.0",
+  "description": "Design System Web Components com Lit, Vite e TypeScript",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "dist/bytebank-wc.umd.js",
+  "module": "dist/bytebank-wc.es.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && npm run build:types",
+    "build:types": "tsc -p tsconfig.json --emitDeclarationOnly",
+    "preview": "vite preview",
+    "check": "tsc -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "lit": "^3.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.0",
+    "autoprefixer": "^10.0.0",
+    "lit": "^3.0.0",
+    "postcss": "^8.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^5.0.0"
+  }
+}

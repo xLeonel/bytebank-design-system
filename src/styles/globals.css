@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:host {
+  --bb-primary: #1f2937;
+  --bb-accent: #3b82f6;
+  --bb-success: #10b981;
+  --bb-warning: #f59e0b;
+  --bb-error: #ef4444;
+  --bb-radius: 0.5rem;
+  --bb-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
