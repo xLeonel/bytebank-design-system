@@ -54,11 +54,17 @@ export class BbBadge extends LitElement {
     }
   `;
 
+  constructor() {
+    super();
+    this.variant = 'primary';
+    this.label = 'Badge';
+  }
+
   @property({ type: String, reflect: true })
-  variant: 'primary' | 'success' | 'warning' | 'error' | 'secondary' = 'primary';
+  variant: 'primary' | 'success' | 'warning' | 'error' | 'secondary';
 
   @property({ type: String })
-  label = 'Badge';
+  label: string;
 
   render() {
     return html`

@@ -87,25 +87,34 @@ export class BbButton extends LitElement {
     }
   `;
 
+  constructor() {
+    super();
+    this.label = 'Button';
+    this.variant = 'primary';
+    this.size = 'md';
+    this.disabled = false;
+    this.fullWidth = false;
+  }
+
   /** Button label text */
   @property({ type: String })
-  label = 'Button';
+  label: string;
 
   /** Button variant style */
   @property({ type: String, reflect: true })
-  variant: ButtonVariant = 'primary';
+  variant: ButtonVariant;
 
   /** Button size */
   @property({ type: String, reflect: true })
-  size: ButtonSize = 'md';
+  size: ButtonSize;
 
   /** Disabled state */
   @property({ type: Boolean, reflect: true })
-  disabled = false;
+  disabled: boolean;
 
   /** Full width button */
   @property({ type: Boolean, attribute: 'full-width', reflect: true })
-  fullWidth = false;
+  fullWidth: boolean;
 
   render() {
     return html`
