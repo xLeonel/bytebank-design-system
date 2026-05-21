@@ -24,10 +24,11 @@
     "lit": "^3.0.0"
   },
   "devDependencies": {
-    "@semantic-release/commit-analyzer": "^10.0.0",
+    "semantic-release": "^18.0.0",
+    "@semantic-release/commit-analyzer": "^9.0.0",
     "@semantic-release/git": "^10.0.0",
-    "@semantic-release/github": "^10.0.0",
-    "@semantic-release/npm": "^10.0.0",
+    "@semantic-release/github": "^8.0.0",
+    "@semantic-release/npm": "^8.0.0",
     "@semantic-release/release-notes-generator": "^10.0.0",
     "autoprefixer": "^10.5.0",
     "lit": "^3.0.0",
