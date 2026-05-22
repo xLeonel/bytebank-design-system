@@ -56,15 +56,13 @@ export class BbBadge extends LitElement {
 
   constructor() {
     super();
-    this.variant = 'primary';
-    this.label = 'Badge';
   }
 
   @property({ type: String, reflect: true })
-  variant: 'primary' | 'success' | 'warning' | 'error' | 'secondary';
+  variant: 'primary' | 'success' | 'warning' | 'error' | 'secondary' = 'primary';
 
   @property({ type: String })
-  label: string;
+  label: string = 'Badge';
 
   render() {
     return html`
