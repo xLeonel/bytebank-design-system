@@ -8,6 +8,14 @@
 export * from './components/bb-button';
 export * from './components/bb-card';
 export * from './components/bb-badge';
+export * from './components/bb-field';
+export * from './components/bb-modal';
+export * from './components/bb-modal-header';
+export * from './components/bb-sidebar';
+export * from './components/bb-transaction-list';
+export * from './components/bb-balance-card';
+export * from './components/bb-new-transaction-modal';
+export * from './components/bb-transaction-detail-modal';
 
 // Import styles globally
 import './styles/globals.css';

@@ -41,6 +41,20 @@ Container para agrupar conteúdo.
 - `title` (string) - Título do card
 - `size` ('sm' | 'md' | 'lg') - Tamanho
 
+### `<bb-modal>`
+Diálogo modal acessível com cabeçalho e conteúdo.
+
+```html
+<bb-modal open aria-label="Modal de exemplo">
+  <bb-modal-header title="Título do modal"></bb-modal-header>
+  <p>Texto de demonstração dentro do modal.</p>
+</bb-modal>
+```
+
+**Props:**
+- `open` (boolean) - Exibe o modal quando verdadeiro
+- `aria-label` (string) - Label acessível para leitura de tela
+
 ### `<bb-badge>`
 Componente para labels e status.
 
@@ -72,6 +86,15 @@ npm run build      # Build e tipos TypeScript
 npm run build:types # Gerar apenas tipos
 npm run check      # Verificar tipos
 ```
+
+## 🧪 Storybook
+
+```bash
+npm run storybook
+npm run build:storybook
+```
+
+Abrir o Storybook localmente permite testar controles, ver documentação e validar componentes interativos como `<bb-modal>`.
 
 Saída em `dist/`:
 - `bytebank-wc.es.js` - ESM bundle
