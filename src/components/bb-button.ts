@@ -92,24 +92,32 @@ export class BbButton extends LitElement {
   }
 
   /** Button label text */
-  @property({ type: String })
-  label: string = 'Button';
+  @property()
+  label!: string;
 
   /** Button variant style */
-  @property({ type: String, reflect: true })
-  variant: ButtonVariant = 'primary';
+  @property({ reflect: true })
+  variant!: ButtonVariant;
 
   /** Button size */
-  @property({ type: String, reflect: true })
-  size: ButtonSize = 'md';
+  @property({ reflect: true })
+  size!: ButtonSize;
 
   /** Disabled state */
-  @property({ type: Boolean, reflect: true })
-  disabled: boolean = false;
+  @property({ reflect: true })
+  disabled!: boolean;
 
   /** Full width button */
-  @property({ type: Boolean, attribute: 'full-width', reflect: true })
-  fullWidth: boolean = false;
+  @property({ attribute: 'full-width', reflect: true })
+  fullWidth!: boolean;
+
+  protected firstUpdated(): void {
+    if (!this.label) this.label = 'Button';
+    if (!this.variant) this.variant = 'primary';
+    if (!this.size) this.size = 'md';
+    if (this.disabled === undefined) this.disabled = false;
+    if (this.fullWidth === undefined) this.fullWidth = false;
+  }
 
   render() {
     return html`

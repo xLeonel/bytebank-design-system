@@ -58,11 +58,16 @@ export class BbBadge extends LitElement {
     super();
   }
 
-  @property({ type: String, reflect: true })
-  variant: 'primary' | 'success' | 'warning' | 'error' | 'secondary' = 'primary';
+  @property({ reflect: true })
+  variant!: 'primary' | 'success' | 'warning' | 'error' | 'secondary';
 
-  @property({ type: String })
-  label: string = 'Badge';
+  @property()
+  label!: string;
+
+  protected firstUpdated(): void {
+    if (!this.variant) this.variant = 'primary';
+    if (!this.label) this.label = 'Badge';
+  }
 
   render() {
     return html`

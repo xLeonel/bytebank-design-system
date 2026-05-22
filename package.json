@@ -1,6 +1,6 @@
 {
   "name": "@xleonel/bytebank-design-system",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Design System Web Components com Lit, Vite e TypeScript",
   "private": false,
   "publishConfig": {

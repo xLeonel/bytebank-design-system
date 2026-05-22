@@ -60,11 +60,16 @@ export class BbCard extends LitElement {
     super();
   }
 
-  @property({ type: String, reflect: true })
-  size: CardSize = 'md';
+  @property({ reflect: true })
+  size!: CardSize;
 
-  @property({ type: String })
-  title: string = '';
+  @property()
+  title!: string;
+
+  protected firstUpdated(): void {
+    if (!this.size) this.size = 'md';
+    if (!this.title) this.title = '';
+  }
 
   render() {
     return html`
