@@ -59,15 +59,10 @@ export class BbBadge extends LitElement {
   }
 
   @property({ reflect: true })
-  variant!: 'primary' | 'success' | 'warning' | 'error' | 'secondary';
+  variant: 'primary' | 'success' | 'warning' | 'error' | 'secondary' = 'primary';
 
   @property()
-  label!: string;
-
-  protected firstUpdated(): void {
-    if (!this.variant) this.variant = 'primary';
-    if (!this.label) this.label = 'Badge';
-  }
+  label = 'Badge';
 
   render() {
     return html`
