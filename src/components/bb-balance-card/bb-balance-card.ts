@@ -49,8 +49,20 @@ export class BbBalanceCard extends LitElement {
       background: var(--bb-primary, #374C34);
       color: white;
       border-radius: 1rem;
-      padding: 2rem;
       min-height: 20rem;
+    }
+
+    /*
+     * Padding lives here, not on :host, so Tailwind v4's preflight
+     * (* { padding: 0 }) cannot override it — external stylesheets
+     * cannot pierce the shadow DOM boundary.
+     */
+    .inner {
+      padding: 2rem;
+      box-sizing: border-box;
+      min-height: inherit;
+      display: flex;
+      flex-direction: column;
     }
 
     .header {
@@ -109,22 +121,24 @@ export class BbBalanceCard extends LitElement {
     const showNegativeColor = this.balance < 0 && this.visible;
 
     return html`
-      <div class="header">
-        <div>
-          <h1 class="title">Olá, ${this.greetingName}! :)</h1>
-          <div class="meta">${this.today}</div>
+      <div class="inner">
+        <div class="header">
+          <div>
+            <h1 class="title">Olá, ${this.greetingName}! :)</h1>
+            <div class="meta">${this.today}</div>
+          </div>
+          <div>
+            <div class="meta">${this.accountType}</div>
+            <button type="button" class="toggle" @click=${this.toggleVisibility}
+                    aria-label="${this.visible ? 'Ocultar saldo' : 'Mostrar saldo'}">
+              ${this.visible ? iconEyeOpen : iconEyeClosed}
+              ${this.visible ? 'Ocultar saldo' : 'Mostrar saldo'}
+            </button>
+          </div>
         </div>
-        <div>
-          <div class="meta">${this.accountType}</div>
-          <button type="button" class="toggle" @click=${this.toggleVisibility}
-                  aria-label="${this.visible ? 'Ocultar saldo' : 'Mostrar saldo'}">
-            ${this.visible ? iconEyeOpen : iconEyeClosed}
-            ${this.visible ? 'Ocultar saldo' : 'Mostrar saldo'}
-          </button>
+        <div class="balance ${showNegativeColor ? 'balance--negative' : ''}">
+          ${this.visible ? formatBrl.format(this.balance) : 'R$ •••••'}
         </div>
-      </div>
-      <div class="balance ${showNegativeColor ? 'balance--negative' : ''}">
-        ${this.visible ? formatBrl.format(this.balance) : 'R$ •••••'}
       </div>
     `;
   }
