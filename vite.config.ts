@@ -29,8 +29,8 @@ export default defineConfig({
       name: 'copy-assets',
       closeBundle() {
         mkdirSync('dist/assets', { recursive: true });
-        copyFileSync('src/assets/logo.png',    'dist/assets/logo.png');
-        copyFileSync('src/assets/favicon.png', 'dist/assets/favicon.png');
+        copyFileSync('src/assets/logo.svg',    'dist/assets/logo.svg');
+        copyFileSync('src/assets/favicon.svg', 'dist/assets/favicon.svg');
       },
     },
   ]

@@ -17,8 +17,8 @@ export * from './components/bb-new-transaction-modal/bb-new-transaction-modal';
 export * from './components/bb-transaction-detail-modal/bb-transaction-detail-modal';
 
 // Brand assets
-export { default as bbFaviconUrl } from './assets/favicon.png?url';
-export { default as bbLogoUrl } from './assets/logo.png?url';
+export { default as bbFaviconUrl } from './assets/favicon.svg?url';
+export { default as bbLogoUrl } from './assets/logo.svg?url';
 
 // Import styles globally
 import './styles/globals.css';

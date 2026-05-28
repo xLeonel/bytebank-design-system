@@ -194,7 +194,7 @@ npm run check        # Verificação de tipos
 
 ```
 src/
-├── assets/          # logo.png, favicon.png
+├── assets/          # logo.svg, favicon.svg
 ├── components/      # Um diretório por componente (ts + stories)
 ├── styles/
 │   └── globals.css  # Tokens CSS e configuração do Tailwind
