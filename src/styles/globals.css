@@ -2,7 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/*
+ * :host is included alongside :root so tokens land directly on every
+ * shadow-DOM host element — mirrors Tailwind v4's @layer theme pattern
+ * and prevents inherited custom properties from going missing inside
+ * shadow roots under Turbopack / Lightning CSS.
+ */
+:root,
+:host {
   /* ── Colors ──────────────────────────────────────── */
   --bb-primary:   #374C34;
   --bb-secondary: #3F38A1;
