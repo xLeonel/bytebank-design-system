@@ -77,9 +77,25 @@ export class BbNewTransactionModal extends LitElement {
     this.isPix = target.value === 'Pix';
   }
 
+  /** Format a raw digit string (centavos) as BRL currency. */
+  private formatCurrency(digits: string): string {
+    if (!digits) return '';
+    const num = parseInt(digits, 10);
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(num / 100);
+  }
+
   private handleAmountChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    this.amount = target.value;
+    const input = event.target as HTMLInputElement;
+    const digits = input.value.replace(/\D/g, '');
+    const formatted = this.formatCurrency(digits);
+    // Store the formatted string — submit parsing strips non-digits.
+    this.amount = formatted;
+    // Overwrite the input synchronously so the display stays formatted
+    // and the cursor naturally sits at the end (centavos-style entry).
+    input.value = formatted;
   }
 
   private handleDateChange(event: Event) {
@@ -93,8 +109,9 @@ export class BbNewTransactionModal extends LitElement {
 
   private submitForm(event: Event) {
     event.preventDefault();
-    const parsed = Number(this.amount.replace(/[^0-9]/g, '')) / 100;
-    if (!this.type || Number.isNaN(parsed) || !this.date) {
+    const digits = this.amount.replace(/\D/g, '');
+    const parsed = digits ? parseInt(digits, 10) / 100 : 0;
+    if (!this.type || !digits || parsed === 0 || Number.isNaN(parsed) || !this.date) {
       return;
     }
     this.dispatchEvent(
@@ -124,7 +141,7 @@ export class BbNewTransactionModal extends LitElement {
 
           <label>
             Valor
-            <input type="text" .value=${this.amount} @input=${this.handleAmountChange} placeholder="0,00" />
+            <input type="text" inputmode="numeric" .value=${this.amount} @input=${this.handleAmountChange} placeholder="R$ 0,00" />
           </label>
 
           ${this.isPix
