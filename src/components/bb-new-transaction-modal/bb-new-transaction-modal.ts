@@ -22,6 +22,12 @@ export class BbNewTransactionModal extends LitElement {
   private date = '';
 
   @state()
+  private agency = '';
+
+  @state()
+  private account = '';
+
+  @state()
   private isPix = false;
 
   static styles = css`
@@ -103,7 +109,53 @@ export class BbNewTransactionModal extends LitElement {
     this.date = target.value;
   }
 
+  /**
+   * Agência mask: XXXX-X  (4 digits + 1 check digit, e.g. "0001-5")
+   * Accepts at most 5 digits; inserts dash before the last one.
+   */
+  private formatAgency(digits: string): string {
+    const d = digits.slice(0, 5);
+    if (d.length <= 4) return d;
+    return `${d.slice(0, 4)}-${d.slice(4)}`;
+  }
+
+  /**
+   * Conta mask: XXXXXXX-X  (up to 7 digits + 1 check digit, e.g. "1234567-8")
+   * The dash always separates the last (check) digit.
+   */
+  private formatAccount(digits: string): string {
+    const d = digits.slice(0, 8);
+    if (d.length <= 1) return d;
+    return `${d.slice(0, -1)}-${d.slice(-1)}`;
+  }
+
+  private handleAgencyInput(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const digits = input.value.replace(/\D/g, '');
+    const formatted = this.formatAgency(digits);
+    this.agency = formatted;
+    input.value = formatted;
+  }
+
+  private handleAccountInput(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const digits = input.value.replace(/\D/g, '');
+    const formatted = this.formatAccount(digits);
+    this.account = formatted;
+    input.value = formatted;
+  }
+
+  private resetForm() {
+    this.type = TRANSACTION_TYPES[0];
+    this.amount = '';
+    this.date = '';
+    this.agency = '';
+    this.account = '';
+    this.isPix = false;
+  }
+
   private close() {
+    this.resetForm();
     this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
@@ -148,17 +200,31 @@ export class BbNewTransactionModal extends LitElement {
             ? html`
                 <label>
                   Chave Pix
-                  <input type="text" placeholder="Digite a chave Pix de destino" />
+                  <input type="text" placeholder="CPF, e-mail, telefone ou chave aleatória" />
                 </label>
               `
             : html`
                 <label>
                   Agência
-                  <input type="text" placeholder="Digite a agência de destino" />
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    .value=${this.agency}
+                    @input=${this.handleAgencyInput}
+                    placeholder="0000-0"
+                    maxlength="6"
+                  />
                 </label>
                 <label>
                   Conta
-                  <input type="text" placeholder="Digite a conta de destino" />
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    .value=${this.account}
+                    @input=${this.handleAccountInput}
+                    placeholder="0000000-0"
+                    maxlength="9"
+                  />
                 </label>
               `}
 
