@@ -1,5 +1,5 @@
 import { LitElement, html, css } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
 export type SidebarItem = {
   href: string;
@@ -11,8 +11,18 @@ export class BbSidebar extends LitElement {
   @property({ type: Array, attribute: false })
   items: SidebarItem[] = [];
 
-  @state()
-  private currentPath = '';
+  /**
+   * The currently active path used to highlight the matching nav item.
+   *
+   * Consumers can set this attribute directly (e.g. `current-path="/home"`)
+   * so the sidebar re-renders the correct active link without a full remount.
+   *
+   * When not provided, falls back to `window.location.pathname` (read once
+   * in `firstUpdated`). This fallback is useful for plain-HTML and Storybook
+   * usage where the attribute isn't wired to a router.
+   */
+  @property({ attribute: 'current-path', type: String })
+  currentPath = '';
 
   static styles = css`
     :host {
@@ -69,7 +79,10 @@ export class BbSidebar extends LitElement {
   `;
 
   firstUpdated() {
-    this.currentPath = window.location.pathname;
+    // Apply the window fallback only when the consumer hasn't set current-path
+    if (!this.currentPath) {
+      this.currentPath = window.location.pathname;
+    }
   }
 
   render() {

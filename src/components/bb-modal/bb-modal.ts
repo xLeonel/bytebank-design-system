@@ -16,7 +16,17 @@ export class BbModal extends LitElement {
   ariaLabel = 'Modal dialog';
 
   static styles = css`
+    /*
+     * Default: hidden and removed from layout so it never blocks pointer events.
+     * :host([open]) re-enables it only when the modal is actually open.
+     * (reflect: true keeps the HTML attribute in sync with this.open)
+     */
     :host {
+      display: none;
+    }
+
+    :host([open]) {
+      display: block;
       position: fixed;
       inset: 0;
       z-index: 1000;
