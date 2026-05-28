@@ -28,6 +28,9 @@ export class BbNewTransactionModal extends LitElement {
   private account = '';
 
   @state()
+  private pixKey = '';
+
+  @state()
   private isPix = false;
 
   static styles = css`
@@ -70,6 +73,16 @@ export class BbNewTransactionModal extends LitElement {
 
     button.secondary {
       background: var(--bb-error, #D8353A);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    button:disabled:hover {
+      opacity: 0.4;
+      transform: none;
     }
   `;
 
@@ -129,6 +142,10 @@ export class BbNewTransactionModal extends LitElement {
     return `${d.slice(0, -1)}-${d.slice(-1)}`;
   }
 
+  private handlePixKeyInput(e: Event) {
+    this.pixKey = (e.target as HTMLInputElement).value;
+  }
+
   private handleAgencyInput(e: Event) {
     const input = e.target as HTMLInputElement;
     const digits = input.value.replace(/\D/g, '');
@@ -145,12 +162,21 @@ export class BbNewTransactionModal extends LitElement {
     input.value = formatted;
   }
 
+  private get isFormValid(): boolean {
+    const digits = this.amount.replace(/\D/g, '');
+    const parsed = digits ? parseInt(digits, 10) / 100 : 0;
+    if (!digits || parsed === 0 || !this.date) return false;
+    if (this.isPix) return this.pixKey.trim().length > 0;
+    return this.agency.length > 0 && this.account.length >= 3; // min "X-X"
+  }
+
   private resetForm() {
     this.type = TRANSACTION_TYPES[0];
     this.amount = '';
     this.date = '';
     this.agency = '';
     this.account = '';
+    this.pixKey = '';
     this.isPix = false;
   }
 
@@ -200,7 +226,12 @@ export class BbNewTransactionModal extends LitElement {
             ? html`
                 <label>
                   Chave Pix
-                  <input type="text" placeholder="CPF, e-mail, telefone ou chave aleatória" />
+                  <input
+                    type="text"
+                    .value=${this.pixKey}
+                    @input=${this.handlePixKeyInput}
+                    placeholder="CPF, e-mail, telefone ou chave aleatória"
+                  />
                 </label>
               `
             : html`
@@ -233,7 +264,7 @@ export class BbNewTransactionModal extends LitElement {
             <input type="date" .value=${this.date} @input=${this.handleDateChange} />
           </label>
 
-          <button type="submit">Concluir transação</button>
+          <button type="submit" ?disabled=${!this.isFormValid}>Concluir transação</button>
           <button type="button" class="secondary" @click=${this.close}>Cancelar</button>
         </form>
       </bb-modal>

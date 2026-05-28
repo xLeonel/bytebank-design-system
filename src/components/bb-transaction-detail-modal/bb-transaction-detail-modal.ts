@@ -1,5 +1,5 @@
-import { LitElement, html, css } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { LitElement, html, css, type PropertyValues } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
 import '../bb-modal/bb-modal';
 
 export type TransactionDetail = {
@@ -25,6 +25,30 @@ export class BbTransactionDetailModal extends LitElement {
 
   @property({ type: String })
   ariaLabel = 'Detalhar transação';
+
+  /** Mirrors the editable fields so we can track changes reactively. */
+  @state() private editedType = '';
+  @state() private editedDescription = '';
+
+  /** Seed editable state whenever a new transaction is loaded. */
+  protected updated(changed: PropertyValues) {
+    if (changed.has('transaction') && this.transaction) {
+      this.editedType = this.transaction.type;
+      this.editedDescription = this.transaction.description ?? '';
+    }
+  }
+
+  private get hasChanges(): boolean {
+    if (!this.transaction) return false;
+    return (
+      this.editedType !== this.transaction.type ||
+      this.editedDescription !== (this.transaction.description ?? '')
+    );
+  }
+
+  private get isFormValid(): boolean {
+    return this.editedType.trim().length > 0;
+  }
 
   static styles = css`
     :host {
@@ -67,25 +91,39 @@ export class BbTransactionDetailModal extends LitElement {
     button.delete {
       background: var(--bb-error, #D8353A);
     }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    button:disabled:hover {
+      opacity: 0.4;
+      transform: none;
+    }
   `;
 
   private close() {
     this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
+  private handleTypeInput(e: Event) {
+    this.editedType = (e.target as HTMLInputElement).value;
+  }
+
+  private handleDescriptionInput(e: Event) {
+    this.editedDescription = (e.target as HTMLInputElement).value;
+  }
+
   private handleSave(event: Event) {
     event.preventDefault();
-    if (!this.transaction) return;
-    const typeInput = this.shadowRoot?.querySelector('#type') as HTMLInputElement;
-    const descriptionInput = this.shadowRoot?.querySelector('#description') as HTMLInputElement;
-    if (!typeInput || !descriptionInput) return;
-
+    if (!this.transaction || !this.hasChanges || !this.isFormValid) return;
     this.dispatchEvent(
       new CustomEvent('save', {
         detail: {
           id: this.transaction.id,
-          type: typeInput.value,
-          description: descriptionInput.value,
+          type: this.editedType,
+          description: this.editedDescription,
         },
         bubbles: true,
         composed: true,
@@ -116,12 +154,12 @@ export class BbTransactionDetailModal extends LitElement {
         <form @submit=${this.handleSave}>
           <label>
             Nome da transação
-            <input id="type" type="text" .value=${this.transaction.type} />
+            <input id="type" type="text" .value=${this.editedType} @input=${this.handleTypeInput} />
           </label>
 
           <label>
             Descrição (opcional)
-            <input id="description" type="text" .value=${this.transaction.description ?? ''} />
+            <input id="description" type="text" .value=${this.editedDescription} @input=${this.handleDescriptionInput} />
           </label>
 
           <label>
@@ -134,7 +172,7 @@ export class BbTransactionDetailModal extends LitElement {
             <input type="text" disabled .value=${this.transaction.date} />
           </label>
 
-          <button type="submit">Salvar alterações</button>
+          <button type="submit" ?disabled=${!this.hasChanges || !this.isFormValid}>Salvar alterações</button>
           <button class="delete" type="button" @click=${this.handleDelete}>Excluir transação</button>
         </form>
       </bb-modal>
