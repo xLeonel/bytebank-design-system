@@ -3,7 +3,7 @@
  *
  * A collection of reusable Web Components built with Lit, Vite, and TypeScript
  * Styled with Tailwind CSS and ready for use in Next.js, Angular, and other frameworks
- */
+*/
 
 export * from './components/bb-button/bb-button';
 export * from './components/bb-card/bb-card';
