@@ -1,14 +1,14 @@
 import { LitElement, html, css } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import '../styles/globals.css';
+import { customElement, property, state } from 'lit/decorators.js';
+import '../../styles/globals.css';
 
 export type CardSize = 'sm' | 'md' | 'lg';
 
 /**
  * @element bb-card
- * 
+ *
  * A card component for grouping content
- * 
+ *
  * @slot - Default slot for card content
  * @slot header - Header content
  * @slot footer - Footer content
@@ -20,7 +20,8 @@ export class BbCard extends LitElement {
       display: block;
       background: white;
       border-radius: var(--bb-radius, 0.5rem);
-      box-shadow: var(--bb-shadow, 0 1px 3px rgba(0, 0, 0, 0.1));
+      box-shadow: 0 4px 16px rgba(55, 76, 52, 0.14);
+      border: 1px solid #d5dcd4;
       overflow: hidden;
     }
 
@@ -30,17 +31,23 @@ export class BbCard extends LitElement {
 
     .header {
       padding: 1.5rem;
-      border-bottom: 1px solid #e5e7eb;
+      background: var(--bb-primary, #374C34);
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
     }
 
     .content {
       padding: 1.5rem;
+      color: var(--bb-dark, #332E2B);
     }
 
     .footer {
-      padding: 1.5rem;
-      border-top: 1px solid #e5e7eb;
-      background: #f9fafb;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid #d5dcd4;
+      background: #f0f4ef;
+      color: var(--bb-dark, #332E2B);
+      font-size: 0.875rem;
     }
 
     :host([size="sm"]) .header,
@@ -66,6 +73,14 @@ export class BbCard extends LitElement {
   @property()
   title = '';
 
+  @state()
+  private _hasFooter = false;
+
+  private _onFooterSlotChange(e: Event) {
+    const slot = e.target as HTMLSlotElement;
+    this._hasFooter = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
   render() {
     return html`
       <div class="card">
@@ -73,8 +88,8 @@ export class BbCard extends LitElement {
         <div class="content">
           <slot></slot>
         </div>
-        <div class="footer">
-          <slot name="footer"></slot>
+        <div class="footer" style=${this._hasFooter ? '' : 'display:none'}>
+          <slot name="footer" @slotchange=${this._onFooterSlotChange}></slot>
         </div>
       </div>
     `;

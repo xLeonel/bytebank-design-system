@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import '../bb-modal/bb-modal';
 
 const TRANSACTION_TYPES = ['Depósito', 'Saque', 'Pix'];
 
@@ -54,7 +55,7 @@ export class BbNewTransactionModal extends LitElement {
     button {
       border: none;
       border-radius: 0.75rem;
-      background: #10b981;
+      background: var(--bb-success, #47A138);
       color: white;
       padding: 0.9rem 1rem;
       font-weight: 700;
@@ -62,7 +63,7 @@ export class BbNewTransactionModal extends LitElement {
     }
 
     button.secondary {
-      background: #ef4444;
+      background: var(--bb-error, #D8353A);
     }
   `;
 
@@ -112,8 +113,7 @@ export class BbNewTransactionModal extends LitElement {
 
   render() {
     return html`
-      <bb-modal .open=${this.open} aria-label=${this.ariaLabel} @close=${this.close}>
-        <bb-modal-header title="Nova transação"></bb-modal-header>
+      <bb-modal title="Nova transação" size="lg" .open=${this.open} aria-label=${this.ariaLabel} @close=${this.close}>
         <form @submit=${this.submitForm}>
           <label>
             Tipo de transação

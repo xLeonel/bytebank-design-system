@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import '../bb-modal/bb-modal';
 
 export type TransactionDetail = {
   id: string;
@@ -52,26 +53,19 @@ export class BbTransactionDetailModal extends LitElement {
       font-family: inherit;
     }
 
-    .buttons {
-      display: flex;
-      gap: 0.75rem;
-    }
-
     button {
       border: none;
       border-radius: 0.75rem;
+      background: var(--bb-success, #47A138);
+      color: white;
       padding: 0.9rem 1rem;
       font-weight: 700;
       cursor: pointer;
-      color: white;
-    }
-
-    button.save {
-      background: #10b981;
+      font-family: inherit;
     }
 
     button.delete {
-      background: #ef4444;
+      background: var(--bb-error, #D8353A);
     }
   `;
 
@@ -118,8 +112,7 @@ export class BbTransactionDetailModal extends LitElement {
     }
 
     return html`
-      <bb-modal .open=${this.open} aria-label=${this.ariaLabel} @close=${this.close}>
-        <bb-modal-header title="Detalhar transação"></bb-modal-header>
+      <bb-modal title="Detalhar transação" .open=${this.open} aria-label=${this.ariaLabel} @close=${this.close}>
         <form @submit=${this.handleSave}>
           <label>
             Nome da transação
@@ -141,10 +134,8 @@ export class BbTransactionDetailModal extends LitElement {
             <input type="text" disabled .value=${this.transaction.date} />
           </label>
 
-          <div class="buttons">
-            <button class="save" type="submit">Salvar alterações</button>
-            <button class="delete" type="button" @click=${this.handleDelete}>Excluir transação</button>
-          </div>
+          <button type="submit">Salvar alterações</button>
+          <button class="delete" type="button" @click=${this.handleDelete}>Excluir transação</button>
         </form>
       </bb-modal>
     `;

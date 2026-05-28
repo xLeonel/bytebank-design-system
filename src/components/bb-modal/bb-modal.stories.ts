@@ -1,5 +1,4 @@
-import '../components/bb-modal';
-import '../components/bb-modal-header';
+import './bb-modal';
 import type { Meta, StoryObj } from '@storybook/web-components';
 
 type ModalArgs = {
@@ -27,8 +26,21 @@ export const Open: Story = {
     'aria-label': 'Modal de demonstração',
   },
   render: ({ open, 'aria-label': ariaLabel }) => `
-<bb-modal ${open ? 'open' : ''} aria-label="${ariaLabel}">
-  <bb-modal-header title="Modal de exemplo"></bb-modal-header>
-  <p>Conteúdo do modal com título, texto e botão de fechar.</p>
+<bb-modal title="Modal de exemplo" ${open ? 'open' : ''} aria-label="${ariaLabel}">
+  <p>Conteúdo do modal com título e botão de fechar no header.</p>
 </bb-modal>`,
+};
+
+export const Closed: Story = {
+  args: {
+    open: false,
+    'aria-label': 'Modal fechado',
+  },
+  render: ({ open, 'aria-label': ariaLabel }) => `
+<div>
+  <p>O modal está fechado. Ative o controle "open" para visualizá-lo.</p>
+  <bb-modal title="Modal fechado" ${open ? 'open' : ''} aria-label="${ariaLabel}">
+    <p>Conteúdo do modal.</p>
+  </bb-modal>
+</div>`,
 };

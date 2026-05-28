@@ -6,6 +6,26 @@ const formatBrl = new Intl.NumberFormat('pt-BR', {
   currency: 'BRL',
 });
 
+const iconEyeOpen = html`
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+       aria-hidden="true">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+`;
+
+const iconEyeClosed = html`
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+       aria-hidden="true">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+    <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+`;
+
 @customElement('bb-balance-card')
 export class BbBalanceCard extends LitElement {
   @property({ type: String })
@@ -26,7 +46,7 @@ export class BbBalanceCard extends LitElement {
   static styles = css`
     :host {
       display: block;
-      background: #005c6e;
+      background: var(--bb-primary, #374C34);
       color: white;
       border-radius: 1rem;
       padding: 2rem;
@@ -60,14 +80,23 @@ export class BbBalanceCard extends LitElement {
       letter-spacing: 0.03em;
     }
 
+    /* Negativo visível: usa --bb-error mesmo sem atingir WCAG sobre o fundo primary */
+    .balance--negative {
+      color: var(--bb-error, #D8353A);
+    }
+
     .toggle {
       background: transparent;
       border: none;
-      color: #f97316;
+      color: var(--bb-warning, #f59e0b);
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 0.9rem;
       padding: 0;
       margin-left: 0.5rem;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
     }
   `;
 
@@ -76,6 +105,9 @@ export class BbBalanceCard extends LitElement {
   }
 
   render() {
+    // Cor vermelha só aparece quando o saldo está visível; oculto mantém branco
+    const showNegativeColor = this.balance < 0 && this.visible;
+
     return html`
       <div class="header">
         <div>
@@ -84,14 +116,22 @@ export class BbBalanceCard extends LitElement {
         </div>
         <div>
           <div class="meta">${this.accountType}</div>
-          <button type="button" class="toggle" @click=${this.toggleVisibility}>
+          <button type="button" class="toggle" @click=${this.toggleVisibility}
+                  aria-label="${this.visible ? 'Ocultar saldo' : 'Mostrar saldo'}">
+            ${this.visible ? iconEyeOpen : iconEyeClosed}
             ${this.visible ? 'Ocultar saldo' : 'Mostrar saldo'}
           </button>
         </div>
       </div>
-      <div class="balance">
+      <div class="balance ${showNegativeColor ? 'balance--negative' : ''}">
         ${this.visible ? formatBrl.format(this.balance) : 'R$ •••••'}
       </div>
     `;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'bb-balance-card': BbBalanceCard;
   }
 }

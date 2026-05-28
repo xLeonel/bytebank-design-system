@@ -1,17 +1,17 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import '../styles/globals.css';
+import '../../styles/globals.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'success';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 /**
  * @element bb-button
- * 
+ *
  * A customizable button component for Bytebank Design System
- * 
+ *
  * @slot - Default slot for button content
- * 
+ *
  * @example
  * <bb-button label="Click me" variant="primary"></bb-button>
  */
@@ -19,9 +19,9 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 export class BbButton extends LitElement {
   static styles = css`
     :host {
-      --button-bg: var(--bb-primary, #1f2937);
+      --button-bg: var(--bb-primary, #374C34);
       --button-color: white;
-      --button-padding: 0.5rem 1rem;
+      --button-padding: 0.75rem var(--bb-space-md); /* 12px 16px → md */
       --button-radius: var(--bb-radius, 0.5rem);
       --button-shadow: var(--bb-shadow, 0 1px 3px rgba(0, 0, 0, 0.1));
     }
@@ -51,39 +51,50 @@ export class BbButton extends LitElement {
       opacity: 0.8;
     }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    :host([variant="secondary"]) button {
+      background: transparent;
+      color: var(--bb-secondary, #3F38A1);
+      border: 1px solid var(--bb-secondary, #3F38A1);
+      box-shadow: none;
     }
 
-    /* Variant styles */
-    :host([variant="secondary"]) {
-      --button-bg: #e5e7eb;
-      --button-color: #1f2937;
+    :host([variant="secondary"]) button:hover {
+      background: rgba(63, 56, 161, 0.06);
+      box-shadow: none;
     }
 
     :host([variant="danger"]) {
-      --button-bg: #ef4444;
+      --button-bg: var(--bb-error, #D8353A);
     }
 
     :host([variant="success"]) {
-      --button-bg: #10b981;
+      --button-bg: var(--bb-success, #47A138);
     }
 
-    /* Size styles */
     :host([size="sm"]) {
-      --button-padding: 0.25rem 0.75rem;
-      font-size: 0.875rem;
+      --button-padding: var(--bb-space-sm) var(--bb-space-md); /* 8px 16px */
+      font-size: var(--bb-font-size-sm);
     }
 
     :host([size="lg"]) {
-      --button-padding: 0.75rem 1.5rem;
-      font-size: 1.125rem;
+      --button-padding: var(--bb-space-md) var(--bb-space-lg); /* 16px 24px */
+      font-size: var(--bb-font-size-lg);
     }
 
-    /* Full width */
     :host([full-width]) button {
       width: 100%;
+    }
+
+    /* Disabled — deve ficar por último para ganhar todos os variants */
+    :host([disabled]) button,
+    :host([disabled]) button:hover {
+      background: #e5e7eb;
+      color: #9ca3af;
+      border: none;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+      opacity: 1;
     }
   `;
 
@@ -104,7 +115,7 @@ export class BbButton extends LitElement {
   size: ButtonSize = 'md';
 
   /** Disabled state */
-  @property({ reflect: true })
+  @property({ type: Boolean, reflect: true })
   disabled = false;
 
   /** Full width button */
@@ -113,10 +124,7 @@ export class BbButton extends LitElement {
 
   render() {
     return html`
-      <button
-        ?disabled="${this.disabled}"
-        class="bb-button"
-      >
+      <button ?disabled="${this.disabled}" class="bb-button">
         <slot>${this.label}</slot>
       </button>
     `;
