@@ -24,6 +24,9 @@ export class BbButton extends LitElement {
       --button-padding: 0.75rem var(--bb-space-md); /* 12px 16px → md */
       --button-radius: var(--bb-radius, 0.5rem);
       --button-shadow: var(--bb-shadow, 0 1px 3px rgba(0, 0, 0, 0.1));
+      /* Hover overrides — leave unset to use each variant's default */
+      --button-hover-bg: initial;
+      --button-hover-color: initial;
     }
 
     button {
@@ -59,7 +62,8 @@ export class BbButton extends LitElement {
     }
 
     :host([variant="secondary"]) button:hover {
-      background: rgba(63, 56, 161, 0.06);
+      background: var(--button-hover-bg, rgba(63, 56, 161, 0.06));
+      color: var(--button-hover-color, var(--bb-secondary, #3F38A1));
       box-shadow: none;
     }
 
