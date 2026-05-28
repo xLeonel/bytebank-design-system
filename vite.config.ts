@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { copyFileSync, mkdirSync } from 'fs';
 import dts from 'vite-plugin-dts';
 
 export default defineConfig({
@@ -20,5 +21,17 @@ export default defineConfig({
     outDir: 'dist',
     target: 'ES2020'
   },
-  plugins: [dts({ insertTypesEntry: true })]
+  plugins: [
+    dts({ insertTypesEntry: true }),
+    {
+      // Copy static assets (logo, favicon) into dist/assets so consumers
+      // can import them directly from the published package.
+      name: 'copy-assets',
+      closeBundle() {
+        mkdirSync('dist/assets', { recursive: true });
+        copyFileSync('src/assets/logo.png',    'dist/assets/logo.png');
+        copyFileSync('src/assets/favicon.png', 'dist/assets/favicon.png');
+      },
+    },
+  ]
 });

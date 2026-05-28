@@ -9,6 +9,14 @@
   "main": "dist/bytebank-wc.umd.js",
   "module": "dist/bytebank-wc.es.js",
   "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/bytebank-wc.es.js",
+      "require": "./dist/bytebank-wc.umd.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./assets/*": "./dist/assets/*"
+  },
   "files": [
     "dist"
   ],
