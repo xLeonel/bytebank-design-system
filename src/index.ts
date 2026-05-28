@@ -10,7 +10,6 @@ export * from './components/bb-card/bb-card';
 export * from './components/bb-badge/bb-badge';
 export * from './components/bb-field/bb-field';
 export * from './components/bb-modal/bb-modal';
-export * from './components/bb-modal-header/bb-modal-header';
 export * from './components/bb-sidebar/bb-sidebar';
 export * from './components/bb-transaction-list/bb-transaction-list';
 export * from './components/bb-balance-card/bb-balance-card';

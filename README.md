@@ -1,124 +1,91 @@
 # Bytebank Design System
 
-Uma biblioteca de Web Components moderna construída com **Lit**, **Vite** e **TypeScript**. Pronta para usar em **Next.js**, **Angular** e qualquer framework JavaScript.
+Sistema de design oficial do **Bytebank** — uma coleção de Web Components reutilizáveis, acessíveis e framework-agnostic, construída com **Lit**, **Vite** e **TypeScript**.
 
-## 🚀 Características
+> 📖 **Documentação interativa dos componentes:** acesse o Storybook em  
+> **[https://xleonel.github.io/bytebank-design-system](https://xleonel.github.io/bytebank-design-system)**
 
-- ✨ **Web Components** reutilizáveis com Lit 3
-- 🎨 **Tailwind CSS** para estilização
-- 📦 **Bundles ESM e UMD** otimizados
-- 📝 **TypeScript** com tipos completos
-- ⚡ **Vite** para build rápido
-- 🔄 **CI/CD** automático no GitHub Actions
-- 🎯 **Framework-agnostic** - funciona em qualquer projeto
+---
 
-## 📋 Componentes
+## O que é o Bytebank Design System?
 
-### `<bb-button>`
-Botão versátil com múltiplas variantes e tamanhos.
+O Bytebank DS centraliza a identidade visual e os padrões de interface do Bytebank em componentes reutilizáveis. Cada componente é construído como **Web Component nativo**, o que significa que funciona em qualquer stack — React, Angular, Next.js, Vue ou HTML puro — sem adaptadores.
 
-```html
-<bb-button label="Click me" variant="primary" size="md"></bb-button>
-```
+A biblioteca expõe tokens de design (cores, tipografia, espaçamento e bordas) via **CSS custom properties**, permitindo que o consumidor adapte a aparência sem sobrescrever estilos internos.
 
-**Props:**
-- `label` (string) - Texto do botão
-- `variant` ('primary' | 'secondary' | 'danger' | 'success') - Estilo
-- `size` ('sm' | 'md' | 'lg') - Tamanho
-- `disabled` (boolean) - Desabilitado
-- `full-width` (boolean) - Largura total
+---
 
-### `<bb-card>`
-Container para agrupar conteúdo.
+## Características
 
-```html
-<bb-card title="My Card" size="md">
-  <p>Card content here</p>
-</bb-card>
-```
+- 🧩 **Web Components nativos** com [Lit 3](https://lit.dev/) — Shadow DOM, reatividade e slots
+- 🎨 **Tokens de design** em CSS custom properties para cores, tipografia, espaçamento e bordas
+- 🔤 **Fonte Inter** como padrão — legível e moderna
+- ♿ **Acessibilidade** — contraste WCAG AA verificado em todos os componentes
+- 📦 **Bundles ESM e UMD** prontos para produção
+- 🔷 **TypeScript** com tipos completos e exportados
+- ⚡ **Vite** para build otimizado com tree-shaking
+- 📖 **Storybook** com documentação interativa de cada componente
+- 🚀 **CI/CD** via GitHub Actions — publish automático no npm com Semantic Release e deploy do Storybook no GitHub Pages
 
-**Props:**
-- `title` (string) - Título do card
-- `size` ('sm' | 'md' | 'lg') - Tamanho
+---
 
-### `<bb-modal>`
-Diálogo modal acessível com cabeçalho e conteúdo.
-
-```html
-<bb-modal open aria-label="Modal de exemplo">
-  <bb-modal-header title="Título do modal"></bb-modal-header>
-  <p>Texto de demonstração dentro do modal.</p>
-</bb-modal>
-```
-
-**Props:**
-- `open` (boolean) - Exibe o modal quando verdadeiro
-- `aria-label` (string) - Label acessível para leitura de tela
-
-### `<bb-badge>`
-Componente para labels e status.
-
-```html
-<bb-badge variant="success" label="Active"></bb-badge>
-```
-
-**Props:**
-- `label` (string) - Texto do badge
-- `variant` ('primary' | 'success' | 'warning' | 'error' | 'secondary') - Estilo
-
-## 🛠️ Instalação
-
-### Via npm
-```bash
-npm install bytebank-design-system
-```
-
-### Desenvolvimento local
-```bash
-npm install
-npm run dev
-```
-
-## 📦 Build
+## Instalação
 
 ```bash
-npm run build      # Build e tipos TypeScript
-npm run build:types # Gerar apenas tipos
-npm run check      # Verificar tipos
+npm install @xleonel/bytebank-design-system
 ```
 
-## 🧪 Storybook
+### Pré-requisito: fonte Inter
 
+A fonte **Inter** não é carregada automaticamente pela lib. Adicione-a no seu projeto:
+
+**Opção 1 — Google Fonts (HTML):**
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+```
+
+**Opção 2 — Fontsource (npm):**
 ```bash
-npm run storybook
-npm run build:storybook
+npm install @fontsource/inter
+```
+```ts
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/700.css';
 ```
 
-Abrir o Storybook localmente permite testar controles, ver documentação e validar componentes interativos como `<bb-modal>`.
+---
 
-Saída em `dist/`:
-- `bytebank-wc.es.js` - ESM bundle
-- `bytebank-wc.umd.js` - UMD bundle
-- `types/` - Declarações TypeScript
+## Uso
 
-## 🚀 Uso
+### Importar componentes
+
+```ts
+import '@xleonel/bytebank-design-system';
+```
+
+### Importar assets de marca
+
+```ts
+import { bbLogoUrl, bbFaviconUrl } from '@xleonel/bytebank-design-system';
+
+// Logotipo
+<img src={bbLogoUrl} alt="Bytebank" />
+
+// Favicon no <head>
+<link rel="icon" href={bbFaviconUrl} />
+```
 
 ### Next.js
 
 ```tsx
 // app/layout.tsx
-import Script from 'next/script';
+import '@xleonel/bytebank-design-system';
 
 export default function RootLayout({ children }) {
   return (
     <html>
-      <head>
-        <Script 
-          src="/bytebank-wc.es.js" 
-          strategy="beforeInteractive" 
-          type="module" 
-        />
-      </head>
       <body>{children}</body>
     </html>
   );
@@ -129,111 +96,133 @@ export default function RootLayout({ children }) {
 // app/page.tsx
 export default function Home() {
   return (
-    <div>
-      <bb-button label="Hello" variant="primary"></bb-button>
-      <bb-card title="Welcome">
-        <p>Content here</p>
-      </bb-card>
-      <bb-badge variant="success">Active</bb-badge>
-    </div>
+    <bb-button label="Entrar" variant="primary"></bb-button>
   );
 }
 ```
 
 ### Angular
 
-```html
-<!-- index.html -->
-<script type="module" src="/assets/bytebank-wc.umd.js"></script>
+```ts
+// app.module.ts
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import '@xleonel/bytebank-design-system';
+
+@NgModule({ schemas: [CUSTOM_ELEMENTS_SCHEMA] })
+export class AppModule {}
 ```
 
-```html
-<!-- app.component.html -->
-<bb-button label="Click"></bb-button>
-<bb-card title="Card Title">Card content</bb-card>
-```
-
-### HTML/Vanilla JS
+### HTML puro
 
 ```html
-<!DOCTYPE html>
-<html>
-<head>
-  <script type="module" src="path/to/bytebank-wc.es.js"></script>
-</head>
-<body>
-  <bb-button label="Test"></bb-button>
-  <bb-card title="My Card">Hello World</bb-card>
-  <bb-badge variant="success">Live</bb-badge>
-</body>
-</html>
+<script type="module">
+  import '@xleonel/bytebank-design-system';
+</script>
+
+<bb-button label="Clique aqui" variant="primary"></bb-button>
 ```
 
-## 🔧 Desenvolvimento
+---
 
-Estrutura do projeto:
+## Componentes
 
-```
-src/
-├── components/
-│   ├── bb-button.ts
-│   ├── bb-card.ts
-│   └── bb-badge.ts
-├── styles/
-│   └── globals.css
-└── index.ts
+Todos os componentes, props, variantes e exemplos interativos estão documentados no **Storybook**:
 
-dist/
-├── bytebank-wc.es.js
-├── bytebank-wc.umd.js
-└── types/
-```
+🔗 **[https://xleonel.github.io/bytebank-design-system](https://xleonel.github.io/bytebank-design-system)**
 
-## 🚀 CI/CD
+| Componente | Tag |
+|---|---|
+| Botão | `<bb-button>` |
+| Card | `<bb-card>` |
+| Badge | `<bb-badge>` |
+| Campo de formulário | `<bb-field>` |
+| Modal | `<bb-modal>` |
+| Sidebar de navegação | `<bb-sidebar>` |
+| Lista de transações | `<bb-transaction-list>` |
+| Card de saldo | `<bb-balance-card>` |
+| Modal nova transação | `<bb-new-transaction-modal>` |
+| Modal detalhe de transação | `<bb-transaction-detail-modal>` |
 
-O workflow `.github/workflows/publish.yml` publica automaticamente no npm quando você faz push de uma tag:
+---
 
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
+## Tokens de design
 
-**Necessário:** Configure o secret `NPM_TOKEN` no GitHub (Settings > Secrets > Actions)
-
-Para gerar um token:
-```bash
-npm login
-npm token create --read-only
-```
-
-## 📚 TypeScript
-
-Tipos completos inclusos. Importe normalmente:
-
-```typescript
-import { BbButton, BbCard, BbBadge } from 'bytebank-design-system';
-
-// Use com declarações de tipo
-const button = document.querySelector('bb-button') as BbButton;
-button.disabled = true;
-```
-
-## 🎨 Personalização
-
-Customize cores via CSS variables:
+Personalize a aparência sobrescrevendo as CSS custom properties no seu projeto:
 
 ```css
 :root {
-  --bb-primary: #1f2937;
-  --bb-accent: #3b82f6;
-  --bb-success: #10b981;
-  --bb-warning: #f59e0b;
-  --bb-error: #ef4444;
-  --bb-radius: 0.5rem;
-  --bb-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  /* Cores */
+  --bb-primary:   #374C34;
+  --bb-secondary: #3F38A1;
+  --bb-accent:    #A15F38;
+  --bb-success:   #47A138;
+  --bb-warning:   #f59e0b;
+  --bb-error:     #D8353A;
+  --bb-dark:      #332E2B;
+
+  /* Tipografia */
+  --bb-font-family: 'Inter', sans-serif;
+
+  /* Espaçamento */
+  --bb-space-xs: 0.25rem;
+  --bb-space-sm: 0.5rem;
+  --bb-space-md: 1rem;
+  --bb-space-lg: 1.5rem;
+  --bb-space-xl: 2rem;
+
+  /* Bordas */
+  --bb-radius-sm: 0.25rem;
+  --bb-radius-md: 0.5rem;
+  --bb-radius-lg: 0.75rem;
+  --bb-radius-xl: 1rem;
 }
 ```
 
-## 📄 Licença
+---
 
-MIT © 2024 Bytebank
+## Desenvolvimento local
+
+```bash
+npm install
+npm run dev          # Inicia o Vite
+npm run storybook    # Storybook em http://localhost:6006
+npm run build        # Build da lib + tipos TypeScript
+npm run check        # Verificação de tipos
+```
+
+### Estrutura do projeto
+
+```
+src/
+├── assets/          # logo.png, favicon.png
+├── components/      # Um diretório por componente (ts + stories)
+├── styles/
+│   └── globals.css  # Tokens CSS e configuração do Tailwind
+└── index.ts         # Entry point e exports
+
+dist/
+├── bytebank-wc.es.js   # ESM bundle
+├── bytebank-wc.umd.js  # UMD bundle
+└── types/              # Declarações TypeScript
+```
+
+---
+
+## CI/CD
+
+O workflow `.github/workflows/publish.yml` roda a cada push na `main`:
+
+1. **Publish** — executa o Semantic Release, que analisa os commits e publica uma nova versão no npm quando necessário
+2. **Deploy Storybook** — builda o Storybook e faz deploy na branch `demo`, servida pelo GitHub Pages
+
+**Secrets necessários no repositório:**
+| Secret | Descrição |
+|---|---|
+| `NPM_TOKEN` | Token de autenticação do npm |
+| `GH_TOKEN` | Personal Access Token do GitHub (para o Semantic Release criar releases e tags) |
+
+---
+
+## Licença
+
+MIT © Bytebank
