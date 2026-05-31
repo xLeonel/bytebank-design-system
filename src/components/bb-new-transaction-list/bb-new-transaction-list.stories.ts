@@ -51,33 +51,3 @@ export const Default: Story = {
     return el;
   },
 };
-
-/**
- * Demonstra o formulário num contêiner com largura máxima — reflete o uso
- * típico em páginas como `/nova-transacao`.
- */
-export const WithContainer: Story = {
-  render: () => {
-    const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'max-width: 480px; padding: 2rem; background: #fff; border-radius: 0.75rem;';
-
-    const title = document.createElement('h2');
-    title.textContent = 'Nova transação';
-    title.style.cssText = 'font-family: Inter, sans-serif; font-size: 1.25rem; font-weight: 700; text-align: center; margin-bottom: 1.5rem; color: #111827;';
-
-    const el = document.createElement('bb-new-transaction-list');
-
-    el.addEventListener('submit', (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      console.log('[bb-new-transaction-list] submit →', detail);
-    });
-
-    el.addEventListener('cancel', () => {
-      console.log('[bb-new-transaction-list] cancel');
-    });
-
-    wrapper.appendChild(title);
-    wrapper.appendChild(el);
-    return wrapper;
-  },
-};
