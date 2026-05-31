@@ -2,7 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import '../bb-modal/bb-modal';
 
-const TRANSACTION_TYPES = ['Depósito', 'Saque', 'Pix'];
+const TRANSACTION_TYPES = ['Depósito', 'Saque', 'Transferência Pix'];
 
 @customElement('bb-new-transaction-modal')
 export class BbNewTransactionModal extends LitElement {
@@ -89,13 +89,13 @@ export class BbNewTransactionModal extends LitElement {
   `;
 
   firstUpdated() {
-    this.isPix = this.type === 'Pix';
+    this.isPix = this.type === 'Transferência Pix';
   }
 
   private handleTypeChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     this.type = target.value;
-    this.isPix = target.value === 'Pix';
+    this.isPix = target.value === 'Transferência Pix';
   }
 
   /** Format a raw digit string (centavos) as BRL currency. */
@@ -198,7 +198,7 @@ export class BbNewTransactionModal extends LitElement {
       new CustomEvent('submit', {
         detail: {
           type: this.type,
-          amount: this.type === 'Saque' ? -Math.abs(parsed) : parsed,
+          amount: (this.type === 'Saque' || this.type === 'Transferência Pix') ? -Math.abs(parsed) : parsed,
           date: this.date,
         },
         bubbles: true,

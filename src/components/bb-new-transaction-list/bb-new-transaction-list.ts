@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-const TRANSACTION_TYPES = ['Depósito', 'Saque', 'Pix'];
+const TRANSACTION_TYPES = ['Depósito', 'Saque', 'Transferência Pix'];
 
 /**
  * @element bb-new-transaction-list
@@ -120,7 +120,7 @@ export class BbNewTransactionList extends LitElement {
   private handleTypeChange(e: Event) {
     const select = e.target as HTMLSelectElement;
     this.type = select.value;
-    this.isPix = select.value === 'Pix';
+    this.isPix = select.value === 'Transferência Pix';
     this.agency = '';
     this.account = '';
     this.pixKey = '';
@@ -175,12 +175,16 @@ export class BbNewTransactionList extends LitElement {
     if (!this.isFormValid) return;
     const digits = this.amount.replace(/\D/g, '');
     const parsed = parseInt(digits, 10) / 100;
+    const isNegative = this.type === 'Saque' || this.type === 'Transferência Pix';
     this.dispatchEvent(
       new CustomEvent('submit', {
         detail: {
           type: this.type,
-          amount: this.type === 'Saque' ? -Math.abs(parsed) : parsed,
+          amount: isNegative ? -Math.abs(parsed) : parsed,
           date: this.date,
+          ...(this.isPix
+            ? { pixKey: this.pixKey }
+            : { agency: this.agency, account: this.account }),
         },
         bubbles: true,
         composed: true,

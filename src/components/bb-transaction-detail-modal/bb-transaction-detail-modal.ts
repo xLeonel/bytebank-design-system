@@ -8,6 +8,12 @@ export type TransactionDetail = {
   description?: string;
   amount: number;
   date: string;
+  /** Agência da conta envolvida na transação (ex: "0001-5"). Read-only no modal. */
+  agency?: string;
+  /** Número da conta envolvida na transação (ex: "1234567-8"). Read-only no modal. */
+  account?: string;
+  /** Chave Pix usada na transferência. Read-only no modal. */
+  pixKey?: string;
 };
 
 const formatBrl = new Intl.NumberFormat('pt-BR', {
@@ -162,6 +168,26 @@ export class BbTransactionDetailModal extends LitElement {
             Descrição (opcional)
             <input id="description" type="text" .value=${this.editedDescription} @input=${this.handleDescriptionInput} />
           </label>
+
+          ${this.transaction.type === 'Transferência Pix' ? html`
+            <label>
+              Chave Pix
+              <input type="text" disabled .value=${this.transaction.pixKey ?? ''} />
+            </label>
+          ` : this.transaction.agency || this.transaction.account ? html`
+            ${this.transaction.agency ? html`
+              <label>
+                Agência
+                <input type="text" disabled .value=${this.transaction.agency} />
+              </label>
+            ` : ''}
+            ${this.transaction.account ? html`
+              <label>
+                Conta
+                <input type="text" disabled .value=${this.transaction.account} />
+              </label>
+            ` : ''}
+          ` : ''}
 
           <label>
             Valor
