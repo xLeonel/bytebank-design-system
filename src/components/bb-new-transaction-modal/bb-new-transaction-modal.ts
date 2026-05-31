@@ -67,8 +67,10 @@ export class BbNewTransactionModal extends LitElement {
       background: var(--bb-success, #47A138);
       color: white;
       padding: 0.9rem 1rem;
+      font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
+      font-family: inherit;
     }
 
     button.secondary {
