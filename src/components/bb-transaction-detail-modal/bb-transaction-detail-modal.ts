@@ -21,6 +21,18 @@ const formatBrl = new Intl.NumberFormat('pt-BR', {
   currency: 'BRL',
 });
 
+/** "DD/MM/YYYY" → "YYYY-MM-DD" for <input type="date"> */
+function toInputDate(display: string): string {
+  const [d, m, y] = display.split('/');
+  return y && m && d ? `${y}-${m}-${d}` : '';
+}
+
+/** "YYYY-MM-DD" → "DD/MM/YYYY" for storage */
+function toDisplayDate(input: string): string {
+  const [y, m, d] = input.split('-');
+  return y && m && d ? `${d}/${m}/${y}` : input;
+}
+
 @customElement('bb-transaction-detail-modal')
 export class BbTransactionDetailModal extends LitElement {
   @property({ type: Boolean, reflect: true })
@@ -33,27 +45,34 @@ export class BbTransactionDetailModal extends LitElement {
   ariaLabel = 'Editar transação';
 
   /** Mirrors the editable fields so we can track changes reactively. */
-  @state() private editedType = '';
   @state() private editedDescription = '';
+  @state() private editedAmount = '';
+  @state() private editedDate = '';
 
   /** Seed editable state whenever a new transaction is loaded. */
   protected updated(changed: PropertyValues) {
     if (changed.has('transaction') && this.transaction) {
-      this.editedType = this.transaction.type;
       this.editedDescription = this.transaction.description ?? '';
+      this.editedAmount = formatBrl.format(Math.abs(this.transaction.amount));
+      this.editedDate = toInputDate(this.transaction.date);
     }
   }
 
   private get hasChanges(): boolean {
     if (!this.transaction) return false;
+    const originalAmount = formatBrl.format(Math.abs(this.transaction.amount));
+    const originalDate = toInputDate(this.transaction.date);
     return (
-      this.editedType !== this.transaction.type ||
-      this.editedDescription !== (this.transaction.description ?? '')
+      this.editedDescription !== (this.transaction.description ?? '') ||
+      this.editedAmount !== originalAmount ||
+      this.editedDate !== originalDate
     );
   }
 
   private get isFormValid(): boolean {
-    return this.editedType.trim().length > 0;
+    const digits = this.editedAmount.replace(/\D/g, '');
+    const parsed = digits ? parseInt(digits, 10) / 100 : 0;
+    return parsed > 0 && this.editedDate.length > 0;
   }
 
   static styles = css`
@@ -81,6 +100,13 @@ export class BbTransactionDetailModal extends LitElement {
       padding: 0.85rem 1rem;
       font-size: 1rem;
       font-family: inherit;
+    }
+
+    input:disabled {
+      background: #f3f4f6;
+      color: #6b7280;
+      cursor: not-allowed;
+      border-color: #e5e7eb;
     }
 
     button {
@@ -114,23 +140,40 @@ export class BbTransactionDetailModal extends LitElement {
     this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
-  private handleTypeInput(e: Event) {
-    this.editedType = (e.target as HTMLInputElement).value;
-  }
-
   private handleDescriptionInput(e: Event) {
     this.editedDescription = (e.target as HTMLInputElement).value;
+  }
+
+  private handleAmountInput(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const digits = input.value.replace(/\D/g, '');
+    const formatted = digits
+      ? formatBrl.format(parseInt(digits, 10) / 100)
+      : '';
+    this.editedAmount = formatted;
+    input.value = formatted;
+  }
+
+  private handleDateInput(e: Event) {
+    this.editedDate = (e.target as HTMLInputElement).value;
   }
 
   private handleSave(event: Event) {
     event.preventDefault();
     if (!this.transaction || !this.hasChanges || !this.isFormValid) return;
+    const digits = this.editedAmount.replace(/\D/g, '');
+    const parsed = parseInt(digits, 10) / 100;
+    // Preserve the original sign (Saque/Transferência Pix stay negative)
+    const amount = Math.sign(this.transaction.amount || -1) === -1
+      ? -Math.abs(parsed)
+      : Math.abs(parsed);
     this.dispatchEvent(
       new CustomEvent('save', {
         detail: {
           id: this.transaction.id,
-          type: this.editedType,
           description: this.editedDescription,
+          amount,
+          date: toDisplayDate(this.editedDate),
         },
         bubbles: true,
         composed: true,
@@ -160,13 +203,13 @@ export class BbTransactionDetailModal extends LitElement {
       <bb-modal title="Editar transação" .open=${this.open} aria-label=${this.ariaLabel} @close=${this.close}>
         <form @submit=${this.handleSave}>
           <label>
-            Nome da transação
-            <input id="type" type="text" .value=${this.editedType} @input=${this.handleTypeInput} />
+            Tipo de transação
+            <input type="text" disabled .value=${this.transaction.type} />
           </label>
 
           <label>
             Descrição (opcional)
-            <input id="description" type="text" .value=${this.editedDescription} @input=${this.handleDescriptionInput} />
+            <input id="description" type="text" .value=${this.editedDescription} @input=${this.handleDescriptionInput} placeholder="Digite a descrição da transação" />
           </label>
 
           ${this.transaction.type === 'Transferência Pix' ? html`
@@ -191,12 +234,12 @@ export class BbTransactionDetailModal extends LitElement {
 
           <label>
             Valor
-            <input type="text" disabled .value=${formatBrl.format(Math.abs(this.transaction.amount))} />
+            <input type="text" inputmode="numeric" .value=${this.editedAmount} @input=${this.handleAmountInput} />
           </label>
 
           <label>
             Data Operação
-            <input type="text" disabled .value=${this.transaction.date} />
+            <input type="date" .value=${this.editedDate} @input=${this.handleDateInput} />
           </label>
 
           <button type="submit" ?disabled=${!this.hasChanges || !this.isFormValid}>Salvar alterações</button>

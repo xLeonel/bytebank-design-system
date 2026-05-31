@@ -17,6 +17,7 @@ export class BbNewTransactionList extends LitElement {
   @state() private type = '';
   @state() private amount = '';
   @state() private date = '';
+  @state() private description = '';
   @state() private agency = '';
   @state() private account = '';
   @state() private pixKey = '';
@@ -154,6 +155,10 @@ export class BbNewTransactionList extends LitElement {
     this.pixKey = (e.target as HTMLInputElement).value;
   }
 
+  private handleDescriptionInput(e: Event) {
+    this.description = (e.target as HTMLInputElement).value;
+  }
+
   private handleDateChange(e: Event) {
     this.date = (e.target as HTMLInputElement).value;
   }
@@ -164,6 +169,7 @@ export class BbNewTransactionList extends LitElement {
     this.type = '';
     this.amount = '';
     this.date = '';
+    this.description = '';
     this.agency = '';
     this.account = '';
     this.pixKey = '';
@@ -182,6 +188,7 @@ export class BbNewTransactionList extends LitElement {
           type: this.type,
           amount: isNegative ? -Math.abs(parsed) : parsed,
           date: this.date,
+          description: this.description || undefined,
           ...(this.isPix
             ? { pixKey: this.pixKey }
             : { agency: this.agency, account: this.account }),
@@ -261,6 +268,16 @@ export class BbNewTransactionList extends LitElement {
                 />
               </label>
             `}
+
+        <label>
+          Descrição (opcional)
+          <input
+            type="text"
+            .value=${this.description}
+            @input=${this.handleDescriptionInput}
+            placeholder="Ex: aluguel, freelance..."
+          />
+        </label>
 
         <label>
           Data
