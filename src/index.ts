@@ -14,6 +14,7 @@ export * from './components/bb-sidebar/bb-sidebar';
 export * from './components/bb-transaction-list/bb-transaction-list';
 export * from './components/bb-balance-card/bb-balance-card';
 export * from './components/bb-new-transaction-modal/bb-new-transaction-modal';
+export * from './components/bb-new-transaction-list/bb-new-transaction-list';
 export * from './components/bb-transaction-detail-modal/bb-transaction-detail-modal';
 
 // Brand assets
