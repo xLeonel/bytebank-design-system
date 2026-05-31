@@ -18,6 +18,7 @@ export class BbNewTransactionList extends LitElement {
   @state() private amount = '';
   @state() private date = '';
   @state() private description = '';
+  @state() private depositType: 'own' | 'other' | '' = '';
   @state() private agency = '';
   @state() private account = '';
   @state() private pixKey = '';
@@ -113,7 +114,12 @@ export class BbNewTransactionList extends LitElement {
     const parsed = digits ? parseInt(digits, 10) / 100 : 0;
     if (!this.type || !digits || parsed === 0 || !this.date) return false;
     if (this.isPix) return this.pixKey.trim().length > 0;
-    return this.agency.length > 0 && this.account.length >= 3;
+    if (this.type === 'Depósito') {
+      if (!this.depositType) return false;
+      if (this.depositType === 'other') return this.agency.length > 0 && this.account.length >= 3;
+      return true; // 'own' — only amount + date needed
+    }
+    return true; // Saque — only amount + date needed
   }
 
   // ── event handlers ────────────────────────────────────────────────────────
@@ -122,9 +128,16 @@ export class BbNewTransactionList extends LitElement {
     const select = e.target as HTMLSelectElement;
     this.type = select.value;
     this.isPix = select.value === 'Transferência Pix';
+    this.depositType = '';
     this.agency = '';
     this.account = '';
     this.pixKey = '';
+  }
+
+  private handleDepositTypeChange(e: Event) {
+    this.depositType = (e.target as HTMLSelectElement).value as 'own' | 'other';
+    this.agency = '';
+    this.account = '';
   }
 
   private handleAmountInput(e: Event) {
@@ -170,6 +183,7 @@ export class BbNewTransactionList extends LitElement {
     this.amount = '';
     this.date = '';
     this.description = '';
+    this.depositType = '';
     this.agency = '';
     this.account = '';
     this.pixKey = '';
@@ -181,22 +195,26 @@ export class BbNewTransactionList extends LitElement {
     if (!this.isFormValid) return;
     const digits = this.amount.replace(/\D/g, '');
     const parsed = parseInt(digits, 10) / 100;
-    const isNegative = this.type === 'Saque' || this.type === 'Transferência Pix';
-    this.dispatchEvent(
-      new CustomEvent('submit', {
-        detail: {
-          type: this.type,
-          amount: isNegative ? -Math.abs(parsed) : parsed,
-          date: this.date,
-          description: this.description || undefined,
-          ...(this.isPix
-            ? { pixKey: this.pixKey }
-            : { agency: this.agency, account: this.account }),
-        },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    const isNegative =
+      this.type === 'Saque' ||
+      this.type === 'Transferência Pix' ||
+      (this.type === 'Depósito' && this.depositType === 'other');
+
+    const detail: Record<string, unknown> = {
+      type: this.type,
+      amount: isNegative ? -Math.abs(parsed) : parsed,
+      date: this.date,
+      description: this.description || undefined,
+    };
+    if (this.isPix) {
+      detail.pixKey = this.pixKey;
+    } else if (this.type === 'Depósito' && this.depositType === 'other') {
+      detail.agency = this.agency;
+      detail.account = this.account;
+    }
+    // Saque and Depósito-own: no ag/conta in event — parent enriches with user's own account.
+
+    this.dispatchEvent(new CustomEvent('submit', { detail, bubbles: true, composed: true }));
     this.resetForm();
   }
 
@@ -232,42 +250,50 @@ export class BbNewTransactionList extends LitElement {
           />
         </label>
 
-        ${this.isPix
-          ? html`
-              <label>
-                Chave Pix
-                <input
-                  type="text"
-                  .value=${this.pixKey}
-                  @input=${this.handlePixKeyInput}
-                  placeholder="CPF, e-mail, telefone ou chave aleatória"
-                />
-              </label>
-            `
-          : html`
-              <label>
-                Agência
-                <input
-                  type="text"
-                  inputmode="numeric"
-                  .value=${this.agency}
-                  @input=${this.handleAgencyInput}
-                  placeholder="0000-0"
-                  maxlength="6"
-                />
-              </label>
-              <label>
-                Conta
-                <input
-                  type="text"
-                  inputmode="numeric"
-                  .value=${this.account}
-                  @input=${this.handleAccountInput}
-                  placeholder="0000000-0"
-                  maxlength="9"
-                />
-              </label>
-            `}
+        ${this.isPix ? html`
+          <label>
+            Chave Pix
+            <input
+              type="text"
+              .value=${this.pixKey}
+              @input=${this.handlePixKeyInput}
+              placeholder="CPF, e-mail, telefone ou chave aleatória"
+            />
+          </label>
+        ` : this.type === 'Depósito' ? html`
+          <label>
+            Tipo de depósito
+            <select .value=${this.depositType} @change=${this.handleDepositTypeChange}>
+              <option value="" disabled>Selecione</option>
+              <option value="own">Na minha conta</option>
+              <option value="other">Em outra conta</option>
+            </select>
+          </label>
+          ${this.depositType === 'other' ? html`
+            <label>
+              Agência
+              <input
+                type="text"
+                inputmode="numeric"
+                .value=${this.agency}
+                @input=${this.handleAgencyInput}
+                placeholder="0000-0"
+                maxlength="6"
+              />
+            </label>
+            <label>
+              Conta
+              <input
+                type="text"
+                inputmode="numeric"
+                .value=${this.account}
+                @input=${this.handleAccountInput}
+                placeholder="0000000-0"
+                maxlength="9"
+              />
+            </label>
+          ` : ''}
+        ` : ''}`}
 
         <label>
           Descrição (opcional)
