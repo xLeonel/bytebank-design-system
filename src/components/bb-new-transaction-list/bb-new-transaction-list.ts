@@ -293,7 +293,7 @@ export class BbNewTransactionList extends LitElement {
               />
             </label>
           ` : ''}
-        ` : ''}`}
+        ` : ''}
 
         <label>
           Descrição (opcional)
