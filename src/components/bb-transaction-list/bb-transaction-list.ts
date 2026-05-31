@@ -170,7 +170,7 @@ export class BbTransactionList extends LitElement {
           <span class="date">${formatDateLong(item.date)}</span>
         </div>
         <div class="actions">
-          <button @click=${() => this.selectItem(item)} type="button">Detalhar transação</button>
+          <button @click=${() => this.selectItem(item)} type="button">Editar transação</button>
           <button class="icon" @click=${() => this.selectItem(item)} type="button">›</button>
         </div>
       </div>

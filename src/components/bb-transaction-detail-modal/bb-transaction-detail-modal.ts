@@ -24,7 +24,7 @@ export class BbTransactionDetailModal extends LitElement {
   transaction: TransactionDetail | null = null;
 
   @property({ type: String })
-  ariaLabel = 'Detalhar transação';
+  ariaLabel = 'Editar transação';
 
   /** Mirrors the editable fields so we can track changes reactively. */
   @state() private editedType = '';
@@ -150,7 +150,7 @@ export class BbTransactionDetailModal extends LitElement {
     }
 
     return html`
-      <bb-modal title="Detalhar transação" .open=${this.open} aria-label=${this.ariaLabel} @close=${this.close}>
+      <bb-modal title="Editar transação" .open=${this.open} aria-label=${this.ariaLabel} @close=${this.close}>
         <form @submit=${this.handleSave}>
           <label>
             Nome da transação
