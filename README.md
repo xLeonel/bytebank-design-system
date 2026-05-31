@@ -138,10 +138,10 @@ Todos os componentes, props, variantes e exemplos interativos estão documentado
 | Campo de formulário | `<bb-field>` |
 | Modal | `<bb-modal>` |
 | Sidebar de navegação | `<bb-sidebar>` |
-| Lista de transações | `<bb-transaction-list>` |
 | Card de saldo | `<bb-balance-card>` |
-| Modal nova transação | `<bb-new-transaction-modal>` |
-| Modal detalhe de transação | `<bb-transaction-detail-modal>` |
+| Lista de transações | `<bb-transaction-list>` |
+| Formulário nova transação | `<bb-new-transaction-list>` |
+| Modal detalhe/edição de transação | `<bb-transaction-detail-modal>` |
 
 ---
 
