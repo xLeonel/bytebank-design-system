@@ -9,7 +9,8 @@ const TRANSACTION_TYPES = ['Depósito', 'Saque', 'Transferência Pix'];
  * Standalone new-transaction form — no modal wrapper.
  * Embed directly in a page (like bb-transaction-list) and listen to:
  *
- *   - `submit`  detail: { type, amount, date }  (amount already signed for Saque)
+ *   - `submit`  detail: { type, amount, date, description?, agency?, account?, pixKey?, attachments? }
+ *              (amount already signed; attachments is File[] when arquivos foram anexados)
  *   - `cancel`  (no detail)
  */
 @customElement('bb-new-transaction-list')
@@ -23,6 +24,7 @@ export class BbNewTransactionList extends LitElement {
   @state() private account = '';
   @state() private pixKey = '';
   @state() private isPix = false;
+  @state() private files: File[] = [];
 
   static styles = css`
     :host {
@@ -83,6 +85,88 @@ export class BbNewTransactionList extends LitElement {
     button:disabled {
       opacity: 0.4;
       cursor: not-allowed;
+    }
+
+    /* ── File attachments ─────────────────────────── */
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .field-label {
+      font-size: 0.9rem;
+      color: #111827;
+    }
+
+    .file-field {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    button.file-trigger {
+      width: auto;
+      background: white;
+      color: var(--bb-primary, #374C34);
+      border: 1px solid var(--bb-primary, #374C34);
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    button.file-trigger:hover:not(:disabled) {
+      background: #f3f4f6;
+      opacity: 1;
+    }
+
+    .file-hint {
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+
+    .file-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .file-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      color: #111827;
+    }
+
+    .file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    button.file-remove {
+      width: auto;
+      background: none;
+      border: none;
+      color: var(--bb-error, #D8353A);
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 0 0.25rem;
+      line-height: 1;
+    }
+
+    button.file-remove:hover:not(:disabled) {
+      opacity: 0.7;
     }
   `;
 
@@ -176,6 +260,24 @@ export class BbNewTransactionList extends LitElement {
     this.date = (e.target as HTMLInputElement).value;
   }
 
+  private triggerFileInput() {
+    const input = this.renderRoot.querySelector('#bb-attachments') as HTMLInputElement | null;
+    input?.click();
+  }
+
+  private handleFilesInput(e: Event) {
+    const input = e.target as HTMLInputElement;
+    this.files = input.files ? Array.from(input.files) : [];
+  }
+
+  private removeFile(index: number) {
+    this.files = this.files.filter((_, i) => i !== index);
+    if (this.files.length === 0) {
+      const input = this.renderRoot.querySelector('#bb-attachments') as HTMLInputElement | null;
+      if (input) input.value = '';
+    }
+  }
+
   // ── actions ───────────────────────────────────────────────────────────────
 
   private resetForm() {
@@ -188,6 +290,9 @@ export class BbNewTransactionList extends LitElement {
     this.account = '';
     this.pixKey = '';
     this.isPix = false;
+    this.files = [];
+    const input = this.renderRoot.querySelector('#bb-attachments') as HTMLInputElement | null;
+    if (input) input.value = '';
   }
 
   private submitForm(e: Event) {
@@ -211,6 +316,9 @@ export class BbNewTransactionList extends LitElement {
     } else if (this.type === 'Depósito' && this.depositType === 'other') {
       detail.agency = this.agency;
       detail.account = this.account;
+    }
+    if (this.files.length) {
+      detail.attachments = this.files;
     }
     // Saque and Depósito-own: no ag/conta in event — parent enriches with user's own account.
 
@@ -313,6 +421,48 @@ export class BbNewTransactionList extends LitElement {
             @input=${this.handleDateChange}
           />
         </label>
+
+        <div class="field">
+          <span class="field-label">Anexos (opcional)</span>
+          <div class="file-field">
+            <button type="button" class="file-trigger" @click=${this.triggerFileInput}>
+              Escolher arquivos
+            </button>
+            <span class="file-hint">
+              ${this.files.length
+                ? `${this.files.length} arquivo${this.files.length > 1 ? 's' : ''} selecionado${this.files.length > 1 ? 's' : ''}`
+                : 'Nenhum arquivo selecionado'}
+            </span>
+          </div>
+          <input
+            id="bb-attachments"
+            type="file"
+            multiple
+            hidden
+            @change=${this.handleFilesInput}
+          />
+          ${this.files.length
+            ? html`
+                <ul class="file-list">
+                  ${this.files.map(
+                    (file, index) => html`
+                      <li class="file-chip">
+                        <span class="file-name">${file.name}</span>
+                        <button
+                          type="button"
+                          class="file-remove"
+                          @click=${() => this.removeFile(index)}
+                          aria-label="Remover ${file.name}"
+                        >
+                          ✕
+                        </button>
+                      </li>
+                    `
+                  )}
+                </ul>
+              `
+            : ''}
+        </div>
 
         <button type="submit" ?disabled=${!this.isFormValid}>
           Concluir transação

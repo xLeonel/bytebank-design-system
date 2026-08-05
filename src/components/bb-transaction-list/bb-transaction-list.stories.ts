@@ -45,3 +45,12 @@ export const GroupedByMonth: Story = {
     return el;
   },
 };
+
+/** Estado vazio — sem transações. Mensagem configurável via empty-title / empty-description */
+export const Empty: Story = {
+  render: () => {
+    const el = document.createElement('bb-transaction-list') as any;
+    el.items = [];
+    return el;
+  },
+};

@@ -48,6 +48,14 @@ export class BbTransactionList extends LitElement {
   @property({ type: Boolean, attribute: 'group-by-month', reflect: true })
   groupByMonth = false;
 
+  /** Título exibido no estado vazio (nenhuma transação). */
+  @property({ type: String, attribute: 'empty-title' })
+  emptyTitle = 'Nenhuma transação por aqui ainda';
+
+  /** Descrição exibida no estado vazio (nenhuma transação). */
+  @property({ type: String, attribute: 'empty-description' })
+  emptyDescription = 'Cadastre uma transação para começar a acompanhar suas finanças.';
+
   static styles = css`
     :host {
       display: block;
@@ -145,6 +153,38 @@ export class BbTransactionList extends LitElement {
       text-decoration: none;
       font-size: 1rem;
     }
+
+    /* ── Empty state ──────────────────────────────── */
+    .empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 0.5rem;
+      padding: 2.5rem 1rem;
+    }
+
+    .empty svg {
+      width: 40px;
+      height: 40px;
+      color: var(--bb-primary, #374C34);
+      opacity: 0.55;
+      margin-bottom: 0.25rem;
+    }
+
+    .empty-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--bb-dark, #332E2B);
+    }
+
+    .empty-description {
+      font-size: 0.85rem;
+      color: #6b7280;
+      max-width: 22rem;
+      line-height: 1.4;
+    }
   `;
 
   private selectItem(item: TransactionItem) {
@@ -200,7 +240,26 @@ export class BbTransactionList extends LitElement {
     `;
   }
 
+  private renderEmpty() {
+    return html`
+      <div class="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <path d="M14 2v6h6" />
+          <path d="M9 13h6" />
+          <path d="M9 17h3" />
+        </svg>
+        <span class="empty-title">${this.emptyTitle}</span>
+        <span class="empty-description">${this.emptyDescription}</span>
+      </div>
+    `;
+  }
+
   render() {
+    if (!this.items || this.items.length === 0) {
+      return this.renderEmpty();
+    }
     return html`
       <div class="list">
         ${this.groupByMonth
