@@ -87,6 +87,11 @@ export class BbNewTransactionList extends LitElement {
       cursor: not-allowed;
     }
 
+    /* Respiro entre o formulário e os botões de ação */
+    button[type='submit'] {
+      margin-top: 0.75rem;
+    }
+
     /* ── File attachments ─────────────────────────── */
     .field {
       display: flex;
