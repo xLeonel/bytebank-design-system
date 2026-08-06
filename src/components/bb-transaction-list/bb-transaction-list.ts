@@ -78,7 +78,20 @@ export class BbTransactionList extends LitElement {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
-      padding: 0.75rem 0;
+      padding: 0.75rem 0.5rem;
+      margin: 0 -0.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .item:hover {
+      background: #f9fafb;
+    }
+
+    .item:focus-visible {
+      outline: 2px solid var(--bb-primary, #374C34);
+      outline-offset: -2px;
     }
 
     /* Divider always on — border-top on every item that follows another item.
@@ -138,19 +151,14 @@ export class BbTransactionList extends LitElement {
       align-items: center;
     }
 
-    button {
-      background: none;
-      border: none;
+    .edit-hint {
       color: var(--bb-primary, #374C34);
       font-size: 0.85rem;
       text-decoration: underline;
-      cursor: pointer;
-      padding: 0;
-      font-family: inherit;
     }
 
-    button.icon {
-      text-decoration: none;
+    .item .icon {
+      color: var(--bb-primary, #374C34);
       font-size: 1rem;
     }
 
@@ -197,10 +205,24 @@ export class BbTransactionList extends LitElement {
     );
   }
 
+  private handleItemKey(e: KeyboardEvent, item: TransactionItem) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      this.selectItem(item);
+    }
+  }
+
   private renderItem(item: TransactionItem) {
     const amountClass = item.amount < 0 ? 'negative' : 'positive';
     return html`
-      <div class="item">
+      <div
+        class="item"
+        role="button"
+        tabindex="0"
+        aria-label=${`Editar transação: ${item.type}`}
+        @click=${() => this.selectItem(item)}
+        @keydown=${(e: KeyboardEvent) => this.handleItemKey(e, item)}
+      >
         <div class="row">
           <div class="info">
             <span class="type">${item.type}</span>
@@ -210,8 +232,8 @@ export class BbTransactionList extends LitElement {
           <span class="date">${formatDateLong(item.date)}</span>
         </div>
         <div class="actions">
-          <button @click=${() => this.selectItem(item)} type="button">Editar transação</button>
-          <button class="icon" @click=${() => this.selectItem(item)} type="button">›</button>
+          <span class="edit-hint">Editar transação</span>
+          <span class="icon" aria-hidden="true">›</span>
         </div>
       </div>
     `;
