@@ -73,8 +73,7 @@ export const WithAttachments: Story = {
       amount: 1500,
       date: '01/05/2026',
       attachments: [
-        { id: 'a1', name: 'recibo.svg', type: 'image/svg+xml', url: img('Recibo', '#374C34') },
-        { id: 'a2', name: 'comprovante.svg', type: 'image/svg+xml', url: img('Comprovante', '#47A138') },
+        { id: 'a1', name: 'comprovante.svg', type: 'image/svg+xml', url: img('Comprovante', '#374C34') },
       ],
     };
     return el;

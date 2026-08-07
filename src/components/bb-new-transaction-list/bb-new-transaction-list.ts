@@ -272,7 +272,8 @@ export class BbNewTransactionList extends LitElement {
 
   private handleFilesInput(e: Event) {
     const input = e.target as HTMLInputElement;
-    this.files = input.files ? Array.from(input.files) : [];
+    // Apenas um comprovante por transação.
+    this.files = input.files && input.files[0] ? [input.files[0]] : [];
   }
 
   private removeFile(index: number) {
@@ -428,21 +429,19 @@ export class BbNewTransactionList extends LitElement {
         </label>
 
         <div class="field">
-          <span class="field-label">Anexos (opcional)</span>
+          <span class="field-label">Comprovante (opcional)</span>
           <div class="file-field">
             <button type="button" class="file-trigger" @click=${this.triggerFileInput}>
-              Escolher arquivos
+              Escolher arquivo
             </button>
             <span class="file-hint">
-              ${this.files.length
-                ? `${this.files.length} arquivo${this.files.length > 1 ? 's' : ''} selecionado${this.files.length > 1 ? 's' : ''}`
-                : 'Nenhum arquivo selecionado'}
+              ${this.files.length ? '1 comprovante selecionado' : 'Nenhum comprovante selecionado'}
             </span>
           </div>
           <input
             id="bb-attachments"
             type="file"
-            multiple
+            accept="image/*,.pdf"
             hidden
             @change=${this.handleFilesInput}
           />

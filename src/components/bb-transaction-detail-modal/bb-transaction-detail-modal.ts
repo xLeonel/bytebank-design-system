@@ -302,7 +302,8 @@ export class BbTransactionDetailModal extends LitElement {
 
   private handleFilesInput(e: Event) {
     const input = e.target as HTMLInputElement;
-    if (input.files) this.newFiles = [...this.newFiles, ...Array.from(input.files)];
+    // Apenas um comprovante (o novo substitui o anterior selecionado).
+    if (input.files && input.files[0]) this.newFiles = [input.files[0]];
     input.value = '';
   }
 
@@ -359,7 +360,7 @@ export class BbTransactionDetailModal extends LitElement {
     const existing = this.transaction?.attachments ?? [];
     return html`
       <div class="field">
-        <span class="field-label">Anexos</span>
+        <span class="field-label">Comprovante</span>
         ${existing.length
           ? html`
               <div class="attachments">
@@ -374,10 +375,12 @@ export class BbTransactionDetailModal extends LitElement {
                 )}
               </div>
             `
-          : html`<span class="muted">Nenhum anexo.</span>`}
+          : html`<span class="muted">Nenhum comprovante.</span>`}
 
-        <button type="button" class="add-attach" @click=${this.triggerFileInput}>Adicionar anexo</button>
-        <input id="bb-edit-attachments" type="file" multiple hidden @change=${this.handleFilesInput} />
+        <button type="button" class="add-attach" @click=${this.triggerFileInput}>
+          ${existing.length ? 'Substituir comprovante' : 'Adicionar comprovante'}
+        </button>
+        <input id="bb-edit-attachments" type="file" accept="image/*,.pdf" hidden @change=${this.handleFilesInput} />
         ${this.newFiles.length
           ? html`
               <ul class="file-list">
