@@ -205,15 +205,32 @@ export class BbTransactionDetailModal extends LitElement {
       color: #6b7280;
     }
 
-    button.add-attach {
+    .file-field {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    button.file-trigger {
       width: auto;
-      align-self: flex-start;
       background: white;
       color: var(--bb-primary, #374C34);
       border: 1px solid var(--bb-primary, #374C34);
       padding: 0.6rem 1rem;
       font-size: 0.9rem;
       font-weight: 600;
+    }
+
+    button.file-trigger:hover {
+      background: #f3f4f6;
+    }
+
+    .file-hint {
+      font-size: 0.85rem;
+      color: #6b7280;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .file-list {
@@ -357,51 +374,33 @@ export class BbTransactionDetailModal extends LitElement {
   }
 
   private renderAttachments() {
-    const existing = this.transaction?.attachments ?? [];
+    const existing = (this.transaction?.attachments ?? [])[0];
+    const newFile = this.newFiles[0];
+    const selected = Boolean(newFile || existing);
+    const selectedName = newFile ? newFile.name : existing ? existing.name : '';
     return html`
       <div class="field">
-        <span class="field-label">Comprovante</span>
-        ${existing.length
+        <span class="field-label">Comprovante (opcional)</span>
+        ${existing && !newFile
           ? html`
               <div class="attachments">
-                ${existing.map((att) =>
-                  att.type.startsWith('image/')
-                    ? html`
-                        <button type="button" class="thumb" title=${att.name} @click=${() => this.enlarge(att.url)}>
-                          <img src=${att.url} alt=${att.name} />
-                        </button>
-                      `
-                    : html`<a class="file-link" href=${att.url} target="_blank" rel="noopener">${att.name}</a>`
-                )}
+                ${existing.type.startsWith('image/')
+                  ? html`
+                      <button type="button" class="thumb" title=${existing.name} @click=${() => this.enlarge(existing.url)}>
+                        <img src=${existing.url} alt=${existing.name} />
+                      </button>
+                    `
+                  : html`<a class="file-link" href=${existing.url} target="_blank" rel="noopener">${existing.name}</a>`}
               </div>
             `
-          : html`<span class="muted">Nenhum comprovante.</span>`}
-
-        <button type="button" class="add-attach" @click=${this.triggerFileInput}>
-          ${existing.length ? 'Substituir comprovante' : 'Adicionar comprovante'}
-        </button>
-        <input id="bb-edit-attachments" type="file" accept="image/*,.pdf" hidden @change=${this.handleFilesInput} />
-        ${this.newFiles.length
-          ? html`
-              <ul class="file-list">
-                ${this.newFiles.map(
-                  (f, i) => html`
-                    <li class="file-chip">
-                      <span class="file-name">${f.name}</span>
-                      <button
-                        type="button"
-                        class="file-remove"
-                        @click=${() => this.removeNewFile(i)}
-                        aria-label="Remover ${f.name}"
-                      >
-                        ✕
-                      </button>
-                    </li>
-                  `
-                )}
-              </ul>
-            `
           : ''}
+        <div class="file-field">
+          <button type="button" class="file-trigger" @click=${this.triggerFileInput}>
+            ${selected ? 'Substituir comprovante' : 'Escolher arquivo'}
+          </button>
+          <span class="file-hint">${selected ? selectedName : 'Nenhum comprovante selecionado'}</span>
+        </div>
+        <input id="bb-edit-attachments" type="file" accept="image/*,.pdf" hidden @change=${this.handleFilesInput} />
       </div>
     `;
   }

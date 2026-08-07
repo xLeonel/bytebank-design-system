@@ -432,10 +432,10 @@ export class BbNewTransactionList extends LitElement {
           <span class="field-label">Comprovante (opcional)</span>
           <div class="file-field">
             <button type="button" class="file-trigger" @click=${this.triggerFileInput}>
-              Escolher arquivo
+              ${this.files.length ? 'Substituir comprovante' : 'Escolher arquivo'}
             </button>
             <span class="file-hint">
-              ${this.files.length ? '1 comprovante selecionado' : 'Nenhum comprovante selecionado'}
+              ${this.files.length ? this.files[0].name : 'Nenhum comprovante selecionado'}
             </span>
           </div>
           <input
@@ -445,27 +445,6 @@ export class BbNewTransactionList extends LitElement {
             hidden
             @change=${this.handleFilesInput}
           />
-          ${this.files.length
-            ? html`
-                <ul class="file-list">
-                  ${this.files.map(
-                    (file, index) => html`
-                      <li class="file-chip">
-                        <span class="file-name">${file.name}</span>
-                        <button
-                          type="button"
-                          class="file-remove"
-                          @click=${() => this.removeFile(index)}
-                          aria-label="Remover ${file.name}"
-                        >
-                          ✕
-                        </button>
-                      </li>
-                    `
-                  )}
-                </ul>
-              `
-            : ''}
         </div>
 
         <button type="submit" ?disabled=${!this.isFormValid}>
