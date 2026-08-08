@@ -79,3 +79,24 @@ export const WithAttachments: Story = {
     return el;
   },
 };
+
+/** Comprovante em PDF — miniatura com ícone; clique abre preview inline (iframe) */
+export const WithPdfAttachment: Story = {
+  render: () => {
+    const pdf =
+      '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 200]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj\n4 0 obj<</Length 46>>stream\nBT /F1 20 Tf 40 100 Td (Comprovante PDF) Tj ET\nendstream endobj\n5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\ntrailer<</Root 1 0 R>>';
+    const el = document.createElement('bb-transaction-detail-modal') as any;
+    el.open = true;
+    el.transaction = {
+      id: '4',
+      type: 'Depósito',
+      description: 'Salário mensal',
+      amount: 1500,
+      date: '01/05/2026',
+      attachments: [
+        { id: 'p1', name: 'comprovante.pdf', type: 'application/pdf', url: 'data:application/pdf;base64,' + btoa(pdf) },
+      ],
+    };
+    return el;
+  },
+};

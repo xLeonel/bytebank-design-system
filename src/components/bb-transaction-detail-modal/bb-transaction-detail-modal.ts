@@ -60,8 +60,8 @@ export class BbTransactionDetailModal extends LitElement {
   @state() private editedDate = '';
   /** Novos arquivos anexados nesta edição (ainda não persistidos). */
   @state() private newFiles: File[] = [];
-  /** URL do anexo aberto no lightbox (null = fechado). */
-  @state() private enlarged: string | null = null;
+  /** Anexo aberto no lightbox (null = fechado). Imagem abre <img>, PDF abre <iframe>. */
+  @state() private enlarged: { url: string; type: string } | null = null;
 
   /** Seed editable state whenever a new transaction is loaded. */
   protected updated(changed: PropertyValues) {
@@ -188,6 +188,22 @@ export class BbTransactionDetailModal extends LitElement {
       display: block;
     }
 
+    button.thumb.thumb-pdf {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.15rem;
+      color: var(--bb-error, #D8353A);
+      font-size: 0.65rem;
+      font-weight: 700;
+    }
+
+    button.thumb.thumb-pdf svg {
+      width: 26px;
+      height: 26px;
+    }
+
     .file-link {
       display: inline-flex;
       align-items: center;
@@ -288,6 +304,34 @@ export class BbTransactionDetailModal extends LitElement {
       max-height: 90vh;
       border-radius: 0.5rem;
     }
+
+    .lightbox-pdf {
+      width: 90vw;
+      height: 90vh;
+      border: none;
+      border-radius: 0.5rem;
+      background: white;
+    }
+
+    button.lightbox-close {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      padding: 0;
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    button.lightbox-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
   `;
 
   private close() {
@@ -328,11 +372,30 @@ export class BbTransactionDetailModal extends LitElement {
     this.newFiles = this.newFiles.filter((_, i) => i !== index);
   }
 
-  private enlarge(url: string) {
-    this.enlarged = url;
+  private enlarge(url: string, type: string) {
+    // Para PDF, converte a data URL em blob URL (iframe exibe PDF com mais
+    // confiabilidade a partir de blob: do que de data:).
+    if (type.includes('pdf') && url.startsWith('data:')) {
+      try {
+        const [meta, b64] = url.split(',');
+        const mime = (meta.match(/data:(.*?);base64/) || [])[1] || 'application/pdf';
+        const bin = atob(b64);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        const blobUrl = URL.createObjectURL(new Blob([bytes], { type: mime }));
+        this.enlarged = { url: blobUrl, type };
+        return;
+      } catch {
+        // fallback: usa a data URL diretamente
+      }
+    }
+    this.enlarged = { url, type };
   }
 
   private closeEnlarge() {
+    if (this.enlarged?.url.startsWith('blob:')) {
+      URL.revokeObjectURL(this.enlarged.url);
+    }
     this.enlarged = null;
   }
 
@@ -386,11 +449,21 @@ export class BbTransactionDetailModal extends LitElement {
               <div class="attachments">
                 ${existing.type.startsWith('image/')
                   ? html`
-                      <button type="button" class="thumb" title=${existing.name} @click=${() => this.enlarge(existing.url)}>
+                      <button type="button" class="thumb" title=${existing.name} @click=${() => this.enlarge(existing.url, existing.type)}>
                         <img src=${existing.url} alt=${existing.name} />
                       </button>
                     `
-                  : html`<a class="file-link" href=${existing.url} target="_blank" rel="noopener">${existing.name}</a>`}
+                  : existing.type.includes('pdf')
+                    ? html`
+                        <button type="button" class="thumb thumb-pdf" title=${existing.name} @click=${() => this.enlarge(existing.url, existing.type)}>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <path d="M14 2v6h6" />
+                          </svg>
+                          PDF
+                        </button>
+                      `
+                    : html`<a class="file-link" href=${existing.url} target="_blank" rel="noopener">${existing.name}</a>`}
               </div>
             `
           : ''}
@@ -462,7 +535,21 @@ export class BbTransactionDetailModal extends LitElement {
       ${this.enlarged
         ? html`
             <div class="lightbox" @click=${this.closeEnlarge}>
-              <img src=${this.enlarged} alt="Anexo ampliado" />
+              <button type="button" class="lightbox-close" @click=${this.closeEnlarge} aria-label="Fechar">
+                ✕
+              </button>
+              ${this.enlarged.type.includes('pdf')
+                ? html`<iframe
+                    class="lightbox-pdf"
+                    src=${this.enlarged.url}
+                    title="Comprovante em PDF"
+                    @click=${(e: Event) => e.stopPropagation()}
+                  ></iframe>`
+                : html`<img
+                    src=${this.enlarged.url}
+                    alt="Comprovante ampliado"
+                    @click=${(e: Event) => e.stopPropagation()}
+                  />`}
             </div>
           `
         : ''}
