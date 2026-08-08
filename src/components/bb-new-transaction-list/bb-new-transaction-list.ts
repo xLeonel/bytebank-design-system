@@ -3,6 +3,36 @@ import { customElement, state } from 'lit/decorators.js';
 
 const TRANSACTION_TYPES = ['Depósito', 'Saque', 'Transferência Pix'];
 
+/** Categorias de despesas/receitas. */
+export const TRANSACTION_CATEGORIES = [
+  'Alimentação', 'Transporte', 'Moradia', 'Lazer', 'Saúde', 'Educação',
+  'Compras', 'Serviços', 'Salário', 'Investimentos', 'Outros',
+];
+
+/** Palavras-chave -> categoria, para a sugestão automática pela descrição. */
+const CATEGORY_KEYWORDS: Record<string, string[]> = {
+  Alimentação: ['mercado', 'supermercado', 'ifood', 'restaurante', 'lanche', 'padaria', 'food', 'cafe', 'café'],
+  Transporte: ['uber', '99', 'gasolina', 'combustivel', 'combustível', 'onibus', 'ônibus', 'metro', 'metrô', 'passagem', 'estacionamento', 'pedagio', 'pedágio'],
+  Moradia: ['aluguel', 'condominio', 'condomínio', 'luz', 'energia', 'agua', 'água', 'gas', 'gás', 'internet', 'iptu'],
+  Lazer: ['cinema', 'netflix', 'spotify', 'show', 'viagem', 'jogo', 'game', 'streaming', 'bar', 'balada'],
+  Saúde: ['farmacia', 'farmácia', 'remedio', 'remédio', 'medico', 'médico', 'consulta', 'hospital', 'dentista', 'academia'],
+  Educação: ['curso', 'faculdade', 'escola', 'livro', 'mensalidade', 'fiap', 'udemy', 'alura'],
+  Compras: ['amazon', 'mercado livre', 'shopping', 'loja', 'roupa', 'magalu', 'aliexpress', 'shopee'],
+  Serviços: ['assinatura', 'taxa', 'tarifa', 'servico', 'serviço', 'manutencao', 'manutenção'],
+  Salário: ['salario', 'salário', 'pagamento', 'holerite', 'proventos'],
+  Investimentos: ['investimento', 'cdb', 'acao', 'ação', 'acoes', 'ações', 'tesouro', 'fii', 'renda fixa', 'bitcoin', 'cripto'],
+};
+
+/** Sugere uma categoria a partir da descrição ('Outros' se nada casar). */
+export function suggestCategory(description: string): string {
+  const text = (description ?? '').toLowerCase().trim();
+  if (!text) return '';
+  for (const category of TRANSACTION_CATEGORIES) {
+    if ((CATEGORY_KEYWORDS[category] ?? []).some((kw) => text.includes(kw))) return category;
+  }
+  return 'Outros';
+}
+
 /**
  * @element bb-new-transaction-list
  *
@@ -25,6 +55,9 @@ export class BbNewTransactionList extends LitElement {
   @state() private pixKey = '';
   @state() private isPix = false;
   @state() private files: File[] = [];
+  @state() private category = '';
+  /** Marca se o usuário escolheu a categoria manualmente (trava a sugestão). */
+  @state() private categoryTouched = false;
 
   static styles = css`
     :host {
@@ -259,6 +292,13 @@ export class BbNewTransactionList extends LitElement {
 
   private handleDescriptionInput(e: Event) {
     this.description = (e.target as HTMLInputElement).value;
+    // Sugere a categoria automaticamente enquanto o usuário não escolher uma.
+    if (!this.categoryTouched) this.category = suggestCategory(this.description);
+  }
+
+  private handleCategoryChange(e: Event) {
+    this.category = (e.target as HTMLSelectElement).value;
+    this.categoryTouched = true;
   }
 
   private handleDateChange(e: Event) {
@@ -297,6 +337,8 @@ export class BbNewTransactionList extends LitElement {
     this.pixKey = '';
     this.isPix = false;
     this.files = [];
+    this.category = '';
+    this.categoryTouched = false;
     const input = this.renderRoot.querySelector('#bb-attachments') as HTMLInputElement | null;
     if (input) input.value = '';
   }
@@ -325,6 +367,9 @@ export class BbNewTransactionList extends LitElement {
     }
     if (this.files.length) {
       detail.attachments = this.files;
+    }
+    if (this.category) {
+      detail.category = this.category;
     }
     // Saque and Depósito-own: no ag/conta in event — parent enriches with user's own account.
 
@@ -417,6 +462,16 @@ export class BbNewTransactionList extends LitElement {
             @input=${this.handleDescriptionInput}
             placeholder="Ex: aluguel, freelance..."
           />
+        </label>
+
+        <label>
+          Categoria (opcional)
+          <select .value=${this.category} @change=${this.handleCategoryChange}>
+            <option value="">Selecione a categoria</option>
+            ${TRANSACTION_CATEGORIES.map(
+              (c) => html`<option value=${c}>${c}</option>`
+            )}
+          </select>
         </label>
 
         <label>

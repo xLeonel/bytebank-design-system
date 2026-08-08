@@ -1,6 +1,7 @@
 import { LitElement, html, css, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import '../bb-modal/bb-modal';
+import { TRANSACTION_CATEGORIES } from '../bb-new-transaction-list/bb-new-transaction-list';
 
 export type TransactionAttachment = {
   id: string;
@@ -16,6 +17,8 @@ export type TransactionDetail = {
   description?: string;
   amount: number;
   date: string;
+  /** Categoria da transação (editável no modal). */
+  category?: string;
   /** Agência da conta envolvida na transação (ex: "0001-5"). Read-only no modal. */
   agency?: string;
   /** Número da conta envolvida na transação (ex: "1234567-8"). Read-only no modal. */
@@ -58,6 +61,7 @@ export class BbTransactionDetailModal extends LitElement {
   @state() private editedDescription = '';
   @state() private editedAmount = '';
   @state() private editedDate = '';
+  @state() private editedCategory = '';
   /** Novos arquivos anexados nesta edição (ainda não persistidos). */
   @state() private newFiles: File[] = [];
   /** Anexo aberto no lightbox (null = fechado). Imagem abre <img>, PDF abre <iframe>. */
@@ -69,6 +73,7 @@ export class BbTransactionDetailModal extends LitElement {
       this.editedDescription = this.transaction.description ?? '';
       this.editedAmount = formatBrl.format(Math.abs(this.transaction.amount));
       this.editedDate = toInputDate(this.transaction.date);
+      this.editedCategory = this.transaction.category ?? '';
       this.newFiles = [];
       this.enlarged = null;
     }
@@ -82,6 +87,7 @@ export class BbTransactionDetailModal extends LitElement {
       this.editedDescription !== (this.transaction.description ?? '') ||
       this.editedAmount !== originalAmount ||
       this.editedDate !== originalDate ||
+      this.editedCategory !== (this.transaction.category ?? '') ||
       this.newFiles.length > 0
     );
   }
@@ -111,12 +117,14 @@ export class BbTransactionDetailModal extends LitElement {
       color: #111827;
     }
 
-    input {
+    input,
+    select {
       border: 1px solid #d1d5db;
       border-radius: 0.75rem;
       padding: 0.85rem 1rem;
       font-size: 1rem;
       font-family: inherit;
+      background: white;
     }
 
     input:disabled {
@@ -342,6 +350,10 @@ export class BbTransactionDetailModal extends LitElement {
     this.editedDescription = (e.target as HTMLInputElement).value;
   }
 
+  private handleCategoryInput(e: Event) {
+    this.editedCategory = (e.target as HTMLSelectElement).value;
+  }
+
   private handleAmountInput(e: Event) {
     const input = e.target as HTMLInputElement;
     const digits = input.value.replace(/\D/g, '');
@@ -415,6 +427,7 @@ export class BbTransactionDetailModal extends LitElement {
           description: this.editedDescription,
           amount,
           date: toDisplayDate(this.editedDate),
+          category: this.editedCategory,
           newAttachments: this.newFiles,
         },
         bubbles: true,
@@ -494,6 +507,14 @@ export class BbTransactionDetailModal extends LitElement {
           <label>
             Descrição (opcional)
             <input id="description" type="text" .value=${this.editedDescription} @input=${this.handleDescriptionInput} placeholder="Digite a descrição da transação" />
+          </label>
+
+          <label>
+            Categoria (opcional)
+            <select .value=${this.editedCategory} @change=${this.handleCategoryInput}>
+              <option value="">Selecione a categoria</option>
+              ${TRANSACTION_CATEGORIES.map((c) => html`<option value=${c}>${c}</option>`)}
+            </select>
           </label>
 
           ${this.transaction.type === 'Transferência Pix' ? html`
