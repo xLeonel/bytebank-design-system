@@ -72,7 +72,7 @@ export class BbButton extends LitElement {
     }
 
     :host([variant="success"]) {
-      --button-bg: var(--bb-success, #47A138);
+      --button-bg: var(--bb-success, #2E7D32);
     }
 
     :host([size="sm"]) {

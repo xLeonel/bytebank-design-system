@@ -134,7 +134,7 @@ export class BbTransactionList extends LitElement {
     }
 
     .amount.positive {
-      color: var(--bb-success, #47A138);
+      color: var(--bb-success, #2E7D32);
     }
 
     .amount.negative {

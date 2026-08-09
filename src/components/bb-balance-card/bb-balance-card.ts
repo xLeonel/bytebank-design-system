@@ -100,7 +100,7 @@ export class BbBalanceCard extends LitElement {
     .toggle {
       background: transparent;
       border: none;
-      color: var(--bb-warning, #f59e0b);
+      color: var(--bb-warning, #FFAB00);
       cursor: pointer;
       font-size: 0.9rem;
       padding: 0;

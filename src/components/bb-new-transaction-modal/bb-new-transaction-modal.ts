@@ -64,7 +64,7 @@ export class BbNewTransactionModal extends LitElement {
     button {
       border: none;
       border-radius: 0.75rem;
-      background: var(--bb-success, #47A138);
+      background: var(--bb-success, #2E7D32);
       color: white;
       padding: 0.9rem 1rem;
       font-size: 1rem;

@@ -29,12 +29,12 @@ export class BbBadge extends LitElement {
     }
 
     :host([variant="success"]) .badge {
-      background: var(--bb-success, #47A138);
+      background: var(--bb-success, #2E7D32);
       color: white;
     }
 
     :host([variant="warning"]) .badge {
-      background: var(--bb-warning, #f59e0b);
+      background: var(--bb-warning, #FFAB00);
       color: white;
     }
 
