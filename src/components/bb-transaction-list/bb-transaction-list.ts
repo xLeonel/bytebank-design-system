@@ -6,6 +6,7 @@ export type TransactionItem = {
   type: string;
   amount: number;
   description?: string;
+  category?: string;
   date: string; // DD/MM/YYYY
 };
 
@@ -47,6 +48,14 @@ export class BbTransactionList extends LitElement {
   /** Group items by month, showing a primary-colored month header */
   @property({ type: Boolean, attribute: 'group-by-month', reflect: true })
   groupByMonth = false;
+
+  /** Exibe skeleton (shimmer) enquanto as transações carregam. */
+  @property({ type: Boolean, reflect: true })
+  loading = false;
+
+  /** Quantidade de linhas do skeleton. */
+  @property({ type: Number, attribute: 'skeleton-rows' })
+  skeletonRows = 5;
 
   /** Título exibido no estado vazio (nenhuma transação). */
   @property({ type: String, attribute: 'empty-title' })
@@ -137,11 +146,60 @@ export class BbTransactionList extends LitElement {
       font-size: 0.8rem;
     }
 
+    .meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.35rem;
+      flex-shrink: 0;
+    }
+
     .date {
       color: #6b7280;
       font-size: 0.8rem;
       white-space: nowrap;
       flex-shrink: 0;
+    }
+
+    .category-tag {
+      display: inline-block;
+      background: #eef3ec;
+      color: var(--bb-primary, #374C34);
+      border: 1px solid rgba(55, 76, 52, 0.15);
+      border-radius: 999px;
+      padding: 0.1rem 0.55rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ── Skeleton (loading) ───────────────────────── */
+    .sk-item {
+      padding: 0.85rem 0.5rem;
+      margin: 0 -0.5rem;
+    }
+    .sk-item + .sk-item {
+      border-top: 1px solid #e5e7eb;
+    }
+    .sk-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .sk-line {
+      height: 0.7rem;
+      border-radius: 0.375rem;
+      background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%);
+      background-size: 400% 100%;
+      animation: bb-shimmer 1.4s ease infinite;
+    }
+    .sk-col { display: flex; flex-direction: column; gap: 0.5rem; }
+    @keyframes bb-shimmer {
+      0% { background-position: 100% 50%; }
+      100% { background-position: 0 50%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .sk-line { animation: none; }
     }
 
     /* ── Actions ──────────────────────────────────── */
@@ -229,7 +287,10 @@ export class BbTransactionList extends LitElement {
             <span class="amount ${amountClass}">${formatBrl.format(item.amount)}</span>
             ${item.description ? html`<span class="description">${item.description}</span>` : ''}
           </div>
-          <span class="date">${formatDateLong(item.date)}</span>
+          <div class="meta">
+            <span class="date">${formatDateLong(item.date)}</span>
+            ${item.category ? html`<span class="category-tag">${item.category}</span>` : ''}
+          </div>
         </div>
         <div class="actions">
           <span class="edit-hint">Editar transação</span>
@@ -262,6 +323,31 @@ export class BbTransactionList extends LitElement {
     `;
   }
 
+  private renderSkeleton() {
+    const rows = Array.from({ length: Math.max(1, this.skeletonRows) });
+    return html`
+      <div class="list" aria-busy="true" aria-label="Carregando transações">
+        ${rows.map(
+          () => html`
+            <div class="sk-item">
+              <div class="sk-row">
+                <div class="sk-col" style="flex:1">
+                  <span class="sk-line" style="width:35%"></span>
+                  <span class="sk-line" style="width:22%"></span>
+                  <span class="sk-line" style="width:55%"></span>
+                </div>
+                <div class="sk-col" style="align-items:flex-end">
+                  <span class="sk-line" style="width:90px"></span>
+                  <span class="sk-line" style="width:60px"></span>
+                </div>
+              </div>
+            </div>
+          `
+        )}
+      </div>
+    `;
+  }
+
   private renderEmpty() {
     return html`
       <div class="empty">
@@ -279,6 +365,9 @@ export class BbTransactionList extends LitElement {
   }
 
   render() {
+    if (this.loading) {
+      return this.renderSkeleton();
+    }
     if (!this.items || this.items.length === 0) {
       return this.renderEmpty();
     }
