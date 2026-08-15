@@ -37,6 +37,14 @@ export class BbBalanceCard extends LitElement {
   @property({ type: String })
   accountType = '';
 
+  /** Agência da conta (ex.: "0001"). Exibida sob o tipo de conta quando presente. */
+  @property({ type: String })
+  agency = '';
+
+  /** Número da conta (ex.: "12345-6"). Exibido sob o tipo de conta quando presente. */
+  @property({ type: String })
+  account = '';
+
   @property({ type: Number })
   balance = 0;
 
@@ -85,6 +93,31 @@ export class BbBalanceCard extends LitElement {
       font-size: 0.95rem;
     }
 
+    /*
+     * Agência e conta sob o tipo de conta. Grid de 2 colunas para os rótulos
+     * ficarem alinhados entre si; opacidade menor que .meta porque é dado de
+     * referência, não informação que se lê a cada visita.
+     */
+    .account {
+      display: grid;
+      grid-template-columns: auto auto;
+      justify-content: start;
+      gap: 0.1rem 0.5rem;
+      /* Respiro embaixo para o bloco não encostar no botão de ocultar saldo. */
+      margin: 0.35rem 0 0.75rem;
+      font-size: 0.85rem;
+      opacity: 0.75;
+    }
+
+    .account dt {
+      font-weight: 400;
+    }
+
+    .account dd {
+      margin: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
     .balance {
       margin-top: 1.5rem;
       font-size: 2rem;
@@ -129,6 +162,12 @@ export class BbBalanceCard extends LitElement {
           </div>
           <div>
             <div class="meta">${this.accountType}</div>
+            ${this.agency || this.account ? html`
+              <dl class="account">
+                ${this.agency ? html`<dt>Agência</dt><dd>${this.agency}</dd>` : ''}
+                ${this.account ? html`<dt>Conta</dt><dd>${this.account}</dd>` : ''}
+              </dl>
+            ` : ''}
             <button type="button" class="toggle" @click=${this.toggleVisibility}
                     aria-label="${this.visible ? 'Ocultar saldo' : 'Mostrar saldo'}">
               ${this.visible ? iconEyeOpen : iconEyeClosed}
